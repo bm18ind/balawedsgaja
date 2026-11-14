@@ -22,7 +22,7 @@
 
   // Tuning: durations are in milliseconds.
   const T = {
-    wipe: isMobile ? 900 : 1050,       // photograph reveal
+    wipe: isMobile ? 1450 : 1250,       // photograph reveal
     wipeDelay: 140,                    // outgoing text leaves first
     copyAt: isMobile ? 760 : 880,      // when the new text begins, measured from the start
     stagger: 85,                       // gap between lines of text
@@ -30,7 +30,7 @@
     cooldown: 220,                     // quiet time before the next change is accepted
     drift: isMobile ? 7000 : 9500      // slow cinematic push-in on each photograph
   };
-  const EASE_WIPE = 'cubic-bezier(.77,0,.18,1)';
+  const EASE_WIPE = 'cubic-bezier(.22,1,.36,1)';
   const EASE_OUT = 'cubic-bezier(.16,1,.3,1)';
 
   // Guided auto-advance: give each chapter time to be viewed, but hand over
@@ -237,8 +237,8 @@
 
       // 2. the next photograph opens over it
       const wipeFrames = dir > 0
-        ? [{ clipPath: 'inset(100% 0% 0% 0% round 34px 34px 0px 0px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px 0px 0px 0px)' }]
-        : [{ clipPath: 'inset(0% 0% 100% 0% round 0px 0px 34px 34px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px 0px 0px 0px)' }];
+        ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
+        : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
       const timing = { duration: T.wipe, delay: T.wipeDelay, easing: EASE_WIPE, fill: 'both' };
       track(to._temp, to.animate(wipeFrames, timing));
       track(from._temp, from.animate([{ translate: '0 0%' }, { translate: `0 ${-6 * dir}%` }], timing));

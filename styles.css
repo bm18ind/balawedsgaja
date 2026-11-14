@@ -1421,3 +1421,13 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
   #scene-4 .profile-copy,
   #scene-6 .profile-copy{padding:6px 11px!important}
 }
+
+
+/* Keep the Bride and Groom biography paragraphs neatly justified
+   inside their text panels on desktop and mobile. */
+#scene-4 .profile-copy .body-copy,
+#scene-6 .profile-copy .body-copy {
+  text-align: justify !important;
+  text-align-last: left;
+  text-justify: inter-word;
+}
