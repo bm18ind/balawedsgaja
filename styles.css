@@ -1311,11 +1311,11 @@ body{overflow-x:hidden;background:#11110f}
     filter: none !important;
   }
   .scene.is-current .scene-image {
-    transform: scale(1.015) !important;
+    transform: scale(1) !important;
     filter: none !important;
   }
   .scene:not(.is-current) .scene-image {
-    transform: scale(1.04) !important;
+    transform: scale(1) !important;
     filter: none !important;
   }
 }
@@ -1327,10 +1327,10 @@ body{overflow-x:hidden;background:#11110f}
 @media (max-width: 700px), (pointer: coarse) {
   #scene-12 .scene-image,
   #scene-12.is-current .scene-image {
-    transform: translate3d(0, -47px, 0) scale(1.015) !important;
+    transform: translate3d(0, -47px, 0) scale(1) !important;
   }
   #scene-12:not(.is-current) .scene-image {
-    transform: translate3d(0, -47px, 0) scale(1.04) !important;
+    transform: translate3d(0, -47px, 0) scale(1) !important;
   }
 }
 
@@ -1430,4 +1430,18 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
   text-align: justify !important;
   text-align-last: left;
   text-justify: inter-word;
+}
+
+
+/* Page 7 mobile: increase the story text for easier reading. */
+@media (max-width: 700px) {
+  #scene-7 .scene-copy {
+    width: 84vw !important;
+    max-width: 84vw !important;
+    padding: 15px 17px !important;
+  }
+  #scene-7 .scene-copy h2 {
+    font-size: clamp(22px, 5.8vw, 30px) !important;
+    line-height: 1.24 !important;
+  }
 }

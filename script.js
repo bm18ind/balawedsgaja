@@ -22,12 +22,12 @@
 
   // Tuning: durations are in milliseconds.
   const T = {
-    wipe: isMobile ? 1450 : 1250,       // photograph reveal
+    wipe: isMobile ? 1050 : 950,        // photograph reveal
     wipeDelay: 140,                    // outgoing text leaves first
-    copyAt: isMobile ? 760 : 880,      // when the new text begins, measured from the start
+    copyAt: isMobile ? 560 : 520,       // when the new text begins, measured from the start
     stagger: 85,                       // gap between lines of text
     child: 700,                        // each line's fade and rise
-    cooldown: 220,                     // quiet time before the next change is accepted
+    cooldown: 100,                     // brief settle before the next queued change
     drift: isMobile ? 7000 : 9500      // slow cinematic push-in on each photograph
   };
   const EASE_WIPE = 'cubic-bezier(.22,1,.36,1)';
@@ -70,6 +70,7 @@
 
   let busy = false;
   let lockUntil = 0;
+  let pendingSteps = 0;
   let transitionTo = () => {};
   const clamp = index => Math.max(0, Math.min(scenes.length - 1, index));
   const wait = ms => new Promise(resolve => window.setTimeout(resolve, ms));
@@ -81,7 +82,15 @@
       scenes[target].scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
       return;
     }
-    if (busy || target === activeIndex) return;
+    if (target === activeIndex && !busy) return;
+    if (busy) {
+      // Keep deliberate input received mid-transition. Previously it was discarded,
+      // making visitors press the button or swipe a second time.
+      if (target > activeIndex) pendingSteps = Math.min(pendingSteps + 1, scenes.length);
+      else if (target < activeIndex) pendingSteps = Math.max(pendingSteps - 1, -scenes.length);
+      return;
+    }
+    if (target === activeIndex) return;
     transitionTo(target, target > activeIndex ? 1 : -1);
   };
 
@@ -206,9 +215,9 @@
       const { image } = partsOf(scene);
       if (!image || getComputedStyle(image).objectFit === 'contain') return;
       const index = scenes.indexOf(scene);
-      const from = isMobile ? 1.1 : 1.14;
+      const from = isMobile ? 1 : 1.14;
       const to = isMobile ? 1 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
-      const shift = dir * ((from - 1) / 2) * 85;
+      const shift = isMobile ? 0 : dir * ((from - 1) / 2) * 85;
       track(scene._anims, image.animate(
         [{ scale: from, translate: `0 ${shift}%` }, { scale: to, translate: '0 0%' }],
         { duration: T.drift, easing: EASE_OUT, fill: 'both' }
@@ -236,16 +245,24 @@
       leaveCopy(from, dir);
 
       // 2. the next photograph opens over it
-      const wipeFrames = dir > 0
-        ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
-        : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
       const timing = { duration: T.wipe, delay: T.wipeDelay, easing: EASE_WIPE, fill: 'both' };
-      track(to._temp, to.animate(wipeFrames, timing));
-      track(from._temp, from.animate([{ translate: '0 0%' }, { translate: `0 ${-6 * dir}%` }], timing));
-      const veil = document.createElement('div');
-      veil.className = 'stage-veil';
-      from.append(veil);
-      track(from._temp, veil.animate([{ opacity: 0 }, { opacity: 0.62 }], timing));
+      let veil = null;
+      if (isMobile) {
+        // Phone: keep the complete image frame visible. Use a soft dissolve
+        // instead of clip-path cropping or a zoom that cuts off the edges.
+        track(to._temp, to.animate([{ opacity: 0.15 }, { opacity: 1 }], timing));
+        track(from._temp, from.animate([{ opacity: 1 }, { opacity: 0 }], timing));
+      } else {
+        const wipeFrames = dir > 0
+          ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
+          : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
+        track(to._temp, to.animate(wipeFrames, timing));
+        track(from._temp, from.animate([{ translate: '0 0%' }, { translate: `0 ${-6 * dir}%` }], timing));
+        veil = document.createElement('div');
+        veil.className = 'stage-veil';
+        from.append(veil);
+        track(from._temp, veil.animate([{ opacity: 0 }, { opacity: 0.62 }], timing));
+      }
       photoEnter(to, dir);
 
       // 3. the new text arrives once the photograph has landed
@@ -256,7 +273,7 @@
       // 4. tidy up
       cancelList(from._temp);
       cancelList(to._temp);
-      veil.remove();
+      veil?.remove();
       cancelList(from._anims);
       from.style.zIndex = '';
       to.style.zIndex = '';
@@ -266,6 +283,16 @@
       lockUntil = performance.now() + T.cooldown;
       await wait(T.cooldown);
       busy = false;
+      if (pendingSteps !== 0) {
+        const step = pendingSteps > 0 ? 1 : -1;
+        pendingSteps -= step;
+        const nextTarget = clamp(activeIndex + step);
+        if (nextTarget !== activeIndex) {
+          transitionTo(nextTarget, step);
+          return;
+        }
+        pendingSteps = 0;
+      }
       scheduleAutoAdvance();
     };
 
@@ -306,25 +333,33 @@
       return null;
     };
 
-    let lastWheel = 0;
-    let lastWheelSize = 0;
+    // Treat the complete wheel/trackpad momentum burst as ONE gesture.
+    // Older logic could interpret later momentum ticks as a second swipe.
+    let wheelGestureLocked = false;
+    let wheelResetTimer = null;
     document.addEventListener('wheel', event => {
       if (event.ctrlKey || event.metaKey) return;
       const dir = event.deltaY > 0 ? 1 : -1;
       if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
       if (scrollerOf(event.target, dir)) return;
       event.preventDefault();
-      const now = performance.now();
+
+      // Restart the idle timer on every wheel tick, including momentum.
+      window.clearTimeout(wheelResetTimer);
+      wheelResetTimer = window.setTimeout(() => {
+        wheelGestureLocked = false;
+      }, 650);
+
       const size = Math.abs(event.deltaY) * (event.deltaMode === 1 ? 16 : 1);
-      const gap = now - lastWheel;
-      const freshGesture = gap > 90 || size > lastWheelSize + 6;
-      lastWheel = now;
-      lastWheelSize = size;
-      if (busy || now < lockUntil || !freshGesture || size < 8) return;
+      if (wheelGestureLocked || size < 8) return;
+
+      wheelGestureLocked = true;
       goToScene(activeIndex + dir);
     }, { passive: false });
 
     let touch = null;
+    let touchNavigationLocked = false;
+    let touchResetTimer = null;
     document.addEventListener('touchstart', event => {
       if (event.touches.length !== 1) { touch = null; return; }
       const point = event.touches[0];
@@ -346,9 +381,14 @@
       const moved = touch.scroller && Math.abs(touch.scroller.scrollTop - touch.top) > 2;
       const start = touch;
       touch = null;
-      if (moved || busy || performance.now() < lockUntil) return;
+      if (moved || touchNavigationLocked) return;
       if (Math.abs(dy) < 48 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
       if (scrollerOf(start.target, dy > 0 ? 1 : -1)) return;
+      touchNavigationLocked = true;
+      window.clearTimeout(touchResetTimer);
+      touchResetTimer = window.setTimeout(() => {
+        touchNavigationLocked = false;
+      }, 650);
       goToScene(activeIndex + (dy > 0 ? 1 : -1));
     }, { passive: true });
     document.addEventListener('touchcancel', () => { touch = null; }, { passive: true });
