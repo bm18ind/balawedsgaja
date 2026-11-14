@@ -1324,12 +1324,13 @@ body{overflow-x:hidden;background:#11110f}
 /* Page 12 refinements:
    Mobile: lift the background photograph by 7px.
    Desktop: shrink the glass copy panel to its content width without changing typography. */
-@media (max-width: 700px) {
-  #scene-12 .scene-image {
-    transform: translateY(-32px) scale(1.015) !important;
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-12 .scene-image,
+  #scene-12.is-current .scene-image {
+    transform: translate3d(0, -47px, 0) scale(1.015) !important;
   }
   #scene-12:not(.is-current) .scene-image {
-    transform: translateY(-32px) scale(1.04) !important;
+    transform: translate3d(0, -47px, 0) scale(1.04) !important;
   }
 }
 
