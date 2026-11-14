@@ -1,0 +1,1316 @@
+:root{--ink:#f8f4ec;--muted:rgba(248,244,236,.9);--accent:#dfc49a;--dark:#171713;--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans',Arial,sans-serif}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-snap-type:y mandatory;background:var(--dark)}body{margin:0;background:var(--dark);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button{font:inherit}
+.noise{position:fixed;inset:0;z-index:30;pointer-events:none;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E")}
+.music-toggle{position:fixed;z-index:60;top:18px;right:22px;display:inline-flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid #ffffff70;border-radius:999px;background:#17171380;color:#fff;backdrop-filter:;-webkit-backdrop-filter:;font:500 8px var(--sans);letter-spacing:.15em;cursor:pointer;box-shadow:0 5px 24px #0002}.music-symbol{font-size:14px;color:var(--accent);line-height:1}.music-switch{width:25px;height:14px;border-radius:20px;background:#d7b98a;display:inline-flex;align-items:center;padding:2px;transition:background .25s}.music-switch i{display:block;width:10px;height:10px;border-radius:50%;background:#24221d;transform:translateX(11px);transition:transform .25s}.music-toggle.is-muted .music-switch{background:#ffffff55}.music-toggle.is-muted .music-switch i{transform:translateX(0);background:#fff}
+.scene{position:relative;min-height:100svh;height:100svh;overflow:hidden;isolation:isolate;background:#26241f;scroll-snap-align:start;scroll-snap-stop:always}.scene-image{position:absolute;z-index:-3;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--image-position,center 50%);transform:scale(1.01);filter:saturate(.94) brightness(.98);transition:filter 1.2s ease,transform 8s cubic-bezier(.2,.7,.2,1);will-change:transform,filter}.scene.is-active .scene-image{transform:scale(1.055)}.scene.show-copy .scene-image{filter:saturate(.9) brightness(.88)}.scene:not(.is-active) .scene-image{filter:saturate(.9) brightness(.94)}
+h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-.045em}h2{font-size:clamp(50px,6.1vw,86px);line-height:1.04;margin:0 0 18px;max-width:720px}h2 em{color:var(--accent);font-weight:400}.scene-copy{position:absolute;z-index:2;max-width:min(640px,48vw);opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.2,.7,.2,1);pointer-events:none;padding:clamp(16px,2vw,28px);border:1px solid #ffffff25;border-radius:22px;background:linear-gradient(135deg,#1515119c,#1515115c);backdrop-filter:;-webkit-backdrop-filter:;box-shadow:0 15px 50px #0002}.scene.show-copy .scene-copy{opacity:1;transform:translateY(0);pointer-events:auto}.hero-copy{left:50%;top:50%;transform:translate(-50%,-43%);max-width:90vw;text-align:center;border:0;background:transparent;box-shadow:none;backdrop-filter:none;padding:0}.scene.show-copy .hero-copy{transform:translate(-50%,-50%)}.hero h1{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2vw,28px);font-size:clamp(58px,10vw,136px);line-height:.98;white-space:nowrap;text-shadow:0 3px 32px #0008}.hero h1 i{font-size:.55em;color:var(--accent)}
+.copy-left{left:7vw;top:50%;transform:translateY(calc(-50% + 22px))}.scene.show-copy .copy-left{transform:translateY(-50%)}.copy-right{right:7vw;top:50%;transform:translateY(calc(-50% + 22px));text-align:left}.scene.show-copy .copy-right{transform:translateY(-50%)}.copy-bottom{left:50%;bottom:10%;transform:translate(-50%,22px);width:min(800px,84vw);max-width:84vw;text-align:center}.scene.show-copy .copy-bottom{transform:translate(-50%,0)}.eyebrow{font-size:11px;letter-spacing:.17em;color:var(--accent);margin:0 0 16px}.body-copy{max-width:440px;color:var(--muted);font-size:18px;line-height:1.7;font-weight:400}.scene-index{position:absolute;right:4vw;bottom:32px;color:#ffffffdc;z-index:4;font-size:10px;letter-spacing:.18em}.scene-index b{color:var(--accent);font-weight:400;margin-left:8px}
+/* Keep text in image negative-space, away from the photographed faces. */
+#scene-3 .scene-copy{right:7vw;left:auto;top:50%;max-width:43vw}#scene-4 .scene-copy{right:6vw;left:auto;top:12%;max-width:38vw;transform:translateY(22px)}#scene-4.show-copy .scene-copy{transform:translateY(0)}#scene-5 .scene-copy{right:6vw;left:auto;top:12%;max-width:43vw;transform:translateY(22px)}#scene-5.show-copy .scene-copy{transform:translateY(0)}#scene-7 .scene-copy{right:6vw;left:auto;top:auto;bottom:12%;max-width:45vw;transform:translateY(22px)}#scene-7.show-copy .scene-copy{transform:translateY(0)}#scene-8 .scene-copy{left:6vw;right:auto;top:50%;max-width:44vw}#scene-9 .scene-copy{left:5vw;right:auto;top:50%;max-width:44vw;text-align:left}#scene-10 .scene-copy{right:5vw;left:auto;top:13%;max-width:43vw;transform:translateY(22px)}#scene-10.show-copy .scene-copy{transform:translateY(0)}#scene-11 .scene-copy{left:5vw;right:auto;top:12%;max-width:44vw;transform:translateY(22px)}#scene-11.show-copy .scene-copy{transform:translateY(0)}#scene-13 .scene-copy{left:50%;top:9%;bottom:auto;transform:translate(-50%,22px);width:min(900px,84vw);max-width:84vw;text-align:center}#scene-13.show-copy .scene-copy{transform:translate(-50%,0)}
+.engagement-date{font-size:clamp(22px,2.6vw,34px);letter-spacing:.03em;color:var(--accent);margin:8px 0 0}.date-lockup{display:flex;align-items:center;gap:22px;margin:22px 0 12px}.date-lockup strong{font:400 92px var(--serif)}.date-lockup span{font-size:16px;line-height:1.8;letter-spacing:.13em;color:var(--muted)}.detail-time{font-size:17px;font-weight:500;letter-spacing:.16em;color:var(--accent);margin:10px 0 16px}
+.glass-button{display:inline-flex;align-items:center;gap:18px;border:1px solid #ffffff91;border-radius:999px;background:#ffffff16;color:white;padding:14px 19px;font-size:10px;letter-spacing:.16em;backdrop-filter:;-webkit-backdrop-filter:;cursor:pointer;transition:background .25s,border-color .25s}.glass-button:hover{background:#ffffff2b;border-color:#fff}.calendar-wrap{position:relative;display:inline-block;margin-top:8px}.calendar-options{position:absolute;left:0;top:calc(100% + 9px);min-width:245px;padding:8px;border:1px solid #ffffff3d;border-radius:14px;background:#191915e8;backdrop-filter:;z-index:10}.calendar-options a,.calendar-options button{display:block;width:100%;padding:12px;text-align:left;color:var(--ink);font-size:12px;border:0;background:transparent;cursor:pointer}.calendar-options a:hover,.calendar-options button:hover{background:#ffffff17;border-radius:8px}
+.split-images{position:absolute;z-index:-3;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:4px}.split-images img{width:100%;height:100%;object-fit:cover;object-position:center 45%;filter:saturate(.94) brightness(.98);transition:filter 1.2s,transform 8s}.scene.show-copy .split-images img{filter:brightness(.88);transform:scale(1.025)}.venue-copy{max-width:min(570px,47vw)}.venue-copy h2{font-size:clamp(44px,5vw,70px);margin-bottom:5px}.map-frame{width:min(420px,100%);height:155px;border:1px solid #ffffff65;border-radius:14px;overflow:hidden;margin:16px 0 12px;box-shadow:0 12px 40px #0003}.map-frame iframe{width:100%;height:100%;border:0}.station-list{max-width:420px;margin:8px 0 5px}.station-list p{display:flex;justify-content:space-between;gap:15px;padding:8px 0;margin:0;border-bottom:1px solid #ffffff38;font-size:13px;color:var(--muted)}.station-list strong{font-weight:500;color:var(--ink)}.station-list span{white-space:nowrap}
+.countdown{display:flex;gap:clamp(12px,2.3vw,27px);margin-top:28px}.countdown>div{display:flex;flex-direction:column;gap:7px;min-width:60px}.countdown strong{font:400 clamp(34px,4vw,54px) var(--serif)}.countdown span{font-size:10px;letter-spacing:.16em;color:var(--accent)}.just-married{font:italic 36px var(--serif);color:var(--accent)}.invitation-line{font-size:clamp(22px,2.5vw,32px);font-family:var(--serif);line-height:1.4;margin-top:10px}
+.family-scene{background:#151411}.family-image{object-fit:contain!important;object-position:center!important;transform:none!important;filter:none!important;background:#151411}.family-copy{left:50%;top:auto;bottom:6%;transform:translate(-50%,22px);width:min(760px,88vw);max-width:88vw;text-align:center;background:#151511a8}.scene.show-copy .family-copy{transform:translate(-50%,0)}.family-columns{display:grid;grid-template-columns:1fr 1fr;gap:35px;text-align:left}.family-columns p{font:400 20px/1.75 var(--serif);margin:0 0 10px}.family-columns strong{font-size:15px;line-height:1.7;letter-spacing:.04em;color:var(--accent);font-weight:500}.closing-copy h2{font-size:clamp(42px,5.8vw,76px)}
+.scene-nav{position:fixed;z-index:45;left:50%;bottom:22px;transform:translateX(-50%);display:flex;align-items:center;gap:18px;padding:9px 16px;border:1px solid #ffffff50;border-radius:999px;background:#1717138a;backdrop-filter:;-webkit-backdrop-filter:;color:#fff}.scene-nav button{display:flex;align-items:center;gap:9px;color:#fff;background:transparent;border:0;cursor:pointer;font-size:15px;padding:4px}.scene-nav button span{font-size:9px;letter-spacing:.14em}.scene-nav button:disabled{opacity:.25;cursor:default}.nav-divider{height:18px;width:1px;background:#ffffff55}.footer{min-height:55px;padding:15px 5vw;display:flex;justify-content:center;align-items:center;color:#ffffffb0;font-size:9px;letter-spacing:.16em}.footer a{color:var(--accent)}
+@media(max-width:700px){html{scroll-snap-type:y proximity}.music-toggle{top:12px;right:12px;padding:8px 10px;gap:7px;font-size:8px}.music-switch{width:23px;height:13px}.music-switch i{width:9px;height:9px;transform:translateX(10px)}.scene{height:100svh;min-height:100svh}.scene-image{object-position:var(--mobile-position,center 50%)}.hero h1{flex-direction:column;gap:1px;font-size:clamp(54px,15vw,92px);line-height:.88}.hero h1 i{font-size:.34em;line-height:1.2}.scene-copy{max-width:88vw!important;width:auto;padding:16px 18px;border-radius:18px}.copy-left{left:5vw;top:auto;bottom:15%;transform:translateY(18px)}.scene.show-copy .copy-left{transform:translateY(0)}.copy-right{right:5vw;left:auto;top:auto;bottom:15%;text-align:left;transform:translateY(18px)}.scene.show-copy .copy-right{transform:translateY(0)}#scene-3 .scene-copy{right:5vw;left:auto;top:auto;bottom:15%}#scene-4 .scene-copy{right:5vw;left:auto;top:12%;bottom:auto;transform:translateY(18px)}#scene-4.show-copy .scene-copy{transform:translateY(0)}#scene-5 .scene-copy{right:5vw;left:auto;top:10%;bottom:auto;transform:translateY(18px)}#scene-5.show-copy .scene-copy{transform:translateY(0)}#scene-7 .scene-copy{right:5vw;left:auto;top:auto;bottom:13%;transform:translateY(18px)}#scene-7.show-copy .scene-copy{transform:translateY(0)}#scene-8 .scene-copy{left:5vw;right:auto;top:auto;bottom:14%}#scene-9 .scene-copy{left:5vw;right:auto;top:auto;bottom:11%;text-align:left}#scene-10 .scene-copy{right:5vw;left:auto;top:10%;bottom:auto;transform:translateY(18px)}#scene-10.show-copy .scene-copy{transform:translateY(0)}#scene-11 .scene-copy{left:5vw;right:auto;top:10%;bottom:auto;transform:translateY(18px)}#scene-11.show-copy .scene-copy{transform:translateY(0)}#scene-13 .scene-copy{left:50%;top:7%;bottom:auto;transform:translate(-50%,18px);width:90vw}#scene-13.show-copy .scene-copy{transform:translate(-50%,0)}h2{font-size:clamp(38px,10vw,58px);margin-bottom:12px}.eyebrow{font-size:9px;margin-bottom:10px}.body-copy{font-size:16px;line-height:1.55}.scene-index{right:15px;bottom:82px;font-size:8px}.date-lockup{gap:15px;margin:15px 0 8px}.date-lockup strong{font-size:72px}.date-lockup span{font-size:12px}.detail-time{font-size:14px}.countdown{gap:10px;margin-top:18px}.countdown>div{min-width:44px}.countdown strong{font-size:32px}.countdown span{font-size:8px}.venue-copy h2{font-size:42px}.map-frame{width:100%;height:118px;margin:10px 0 6px}.station-list{margin:4px 0}.station-list p{font-size:11px;padding:6px 0}.family-image{object-fit:contain!important;top:2%;height:58%;bottom:auto}.family-copy{left:50%;top:auto;bottom:8%;width:92vw;max-width:92vw;padding:13px 15px;transform:translate(-50%,18px)}.scene.show-copy .family-copy{transform:translate(-50%,0)}.family-columns{gap:12px}.family-columns p{font-size:15px;line-height:1.55}.family-columns strong{font-size:11px}.split-images{grid-template-columns:1fr 1fr}.scene-nav{bottom:12px;padding:8px 13px;gap:13px}.scene-nav button span{font-size:8px}.footer{padding:15px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+
+/* Mobile refinement pass: lighter typography surfaces and safer image framing. */
+.back-to-top{border:1px solid #ffffff55;border-radius:999px;padding:12px 20px;background:#171713b8;color:var(--accent);font:500 10px var(--sans);letter-spacing:.16em;cursor:pointer}
+.back-to-top:active{transform:translateY(1px)}
+#scene-4 .scene-copy{top:50%;bottom:auto;transform:translateY(calc(-50% + 22px))}
+#scene-4.show-copy .scene-copy{transform:translateY(-50%)}
+#scene-5 .scene-image{object-position:center 52%}
+#scene-9 .scene-image{object-position:center 55%}
+#scene-10 .scene-image{object-position:center 50%}
+#scene-12 .family-copy{bottom:6%}
+#scene-12 .family-columns>div:first-child{text-align:left}
+#scene-12 .family-columns>div:last-child{text-align:right}
+@media(max-width:700px){
+  /* Keep the glass treatment only on the Save the Date and venue panels. */
+  .scene-copy{background:transparent!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:12px 4px!important;border-radius:0!important;text-shadow:0 2px 18px #0009}
+  #scene-8 .scene-copy,#scene-9 .scene-copy{background:#17171370!important;border:1px solid #ffffff35!important;border-radius:18px!important;padding:15px 16px!important;backdrop-filter:!important;-webkit-backdrop-filter:!important;box-shadow:0 10px 35px #0002!important}
+  #scene-4 .scene-copy{right:5vw;left:5vw;top:auto;bottom:13%;max-width:90vw;text-align:left;transform:translateY(18px)}
+  #scene-4.show-copy .scene-copy{transform:translateY(0)}
+  /* Show both people in the first-meeting photograph rather than cropping to one face. */
+  #scene-5 .scene-image{object-fit:contain;object-position:center center;background:#171713;transform:none}
+  #scene-5.show-copy .scene-image{transform:none}
+  /* One engagement photograph (6B) is easier to read on a phone. */
+  #scene-6 .engagement-image{object-fit:contain;object-position:center center;background:#171713;transform:none}
+  #scene-6.show-copy .engagement-image{transform:none}
+  /* Keep both people in the venue photograph and pull the framing slightly wider. */
+  #scene-9 .scene-image{object-fit:contain;object-position:center center;background:#171713;transform:none}
+  #scene-9.show-copy .scene-image{transform:none}
+  /* The candle scene is deliberately zoomed out to retain both faces and hands. */
+  #scene-10 .scene-image{object-fit:contain;object-position:center center;background:#171713;transform:none}
+  #scene-10.show-copy .scene-image{transform:none}
+  /* Family photograph remains complete; text sits beside it in a balanced two-column layout. */
+  #scene-12 .family-image{top:0;left:0;width:100%;height:100%;object-fit:contain!important;object-position:center 43%!important}
+  #scene-12 .family-copy{left:50%;top:auto;bottom:7%;width:94vw;max-width:94vw;padding:10px 12px!important;background:#17171375!important;border:1px solid #ffffff28!important;border-radius:14px!important;backdrop-filter:!important;-webkit-backdrop-filter:!important;transform:translate(-50%,18px)}
+  #scene-12 .family-columns{grid-template-columns:1fr 1fr;gap:18px}
+  #scene-12 .family-columns>div:first-child{text-align:left}
+  #scene-12 .family-columns>div:last-child{text-align:right}
+  #scene-12 .family-columns p{font-size:clamp(13px,3.6vw,16px);line-height:1.5}
+  #scene-12 .family-columns strong{font-size:clamp(10px,2.8vw,12px);line-height:1.45}
+  #scene-13 .scene-copy{left:50%;top:50%;bottom:auto;width:90vw;max-width:90vw;text-align:center;transform:translate(-50%,18px)}
+  #scene-13.show-copy .scene-copy{transform:translate(-50%,-50%)}
+  .back-to-top{font-size:10px;padding:12px 22px}
+}
+
+@media(min-width:701px){
+  #scene-12 .family-copy{left:auto;right:5vw;top:50%;bottom:auto;transform:translateY(calc(-50% + 22px));width:min(620px,58vw);max-width:58vw}
+  #scene-12.show-copy .family-copy{transform:translateY(-50%)}
+}
+
+/* Opening title refinement: soft champagne-yellow with a gentle shadow. */
+.hero h1 span,
+.hero h1 i{
+  color:#e8d49a;
+  text-shadow:0 2px 14px rgba(18,16,10,.48), 0 1px 3px rgba(0,0,0,.35);
+}
+@media(max-width:700px){
+  .hero-copy{top:41%!important;}
+  .scene.show-copy .hero-copy{transform:translate(-50%,-50%);}
+  .hero h1 span{color:#e8d49a;}
+}
+
+/* Latest visual pass: restore the glass UI, strengthen the opening title, and lift the family panel. */
+.hero h1 span,
+.hero h1 i{
+  color:#c99a32 !important; /* rich muted yellow-ochre */
+  font-weight:700 !important;
+  text-shadow:0 3px 16px rgba(20,16,8,.72),0 1px 3px rgba(0,0,0,.55) !important;
+}
+@media(max-width:700px){
+  .hero-copy{top:33% !important;}
+  .scene.show-copy .hero-copy{transform:translate(-50%,-50%) !important;}
+}
+/* Restore the familiar glass treatment to section headings on mobile. */
+@media(max-width:700px){
+  .scene-copy{
+    background:linear-gradient(135deg,rgba(24,23,20,.68),rgba(24,23,20,.42)) !important;
+    border:1px solid rgba(255,255,255,.28) !important;
+    box-shadow:0 12px 36px rgba(0,0,0,.20) !important;
+    backdrop-filter: saturate(125%) !important;
+    -webkit-backdrop-filter: saturate(125%) !important;
+    border-radius:20px !important;
+    padding:15px 17px !important;
+    text-shadow:none !important;
+  }
+  /* Keep the special Save the Date and venue glass panels as designed. */
+  #scene-8 .scene-copy,#scene-9 .scene-copy{
+    background:rgba(23,22,19,.62) !important;
+    border-color:rgba(255,255,255,.38) !important;
+  }
+}
+/* Family names sit higher, clear of the fixed navigation, on a light frosted-glass panel. */
+.family-copy{
+  bottom:13% !important;
+  background:rgba(246,240,226,.82) !important;
+  color:#29251d !important;
+  border:1px solid rgba(255,255,255,.72) !important;
+  box-shadow:0 14px 42px rgba(0,0,0,.16) !important;
+  backdrop-filter: saturate(125%) !important;
+  -webkit-backdrop-filter: saturate(125%) !important;
+}
+.family-copy .eyebrow{color:#96702a !important;}
+.family-columns p{color:#29251d !important;}
+.family-columns strong{color:#806020 !important;}
+@media(max-width:700px){
+  #scene-12 .family-copy{
+    bottom:14% !important;
+    background:rgba(246,240,226,.86) !important;
+    color:#29251d !important;
+    padding:12px 14px !important;
+  }
+  #scene-12 .family-columns p{color:#29251d !important;}
+}
+
+/* Final interaction polish: visible end-card return control and gentle mobile motion. */
+#scene-1 .hero-copy,
+#scene-1.show-copy .hero-copy {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+}
+#scene-13 .back-to-top {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  pointer-events: auto;
+  background: rgba(23,22,19,.62);
+  border: 1px solid rgba(255,255,255,.42);
+  color: #f0d9a2;
+  backdrop-filter:;
+  -webkit-backdrop-filter:;
+}
+/* Legacy mobile zoom rule removed: scroll-linked animation now controls these image planes. */
+
+
+/* Definitive opening-title override: Oswald Bold in pure white. */
+#scene-1 .hero-copy h1,
+#scene-1 .hero-copy h1 span,
+#scene-1 .hero-copy h1 i,
+#scene-1.show-copy .hero-copy h1,
+#scene-1.show-copy .hero-copy h1 span,
+#scene-1.show-copy .hero-copy h1 i {
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  -webkit-text-fill-color: #FFFFFF !important;
+  text-shadow: 0 3px 18px rgba(0,0,0,.72), 0 1px 3px rgba(0,0,0,.5) !important;
+}
+
+
+/* Full-bleed, centered photography for the key story moments. */
+#scene-5 .scene-image,
+#scene-6 .scene-image,
+#scene-9 .scene-image,
+#scene-10 .scene-image {
+  object-fit: cover !important;
+  object-position: center center !important;
+  background: transparent !important;
+}
+@media (max-width:700px) {
+  #scene-5 .scene-image,
+  #scene-6 .scene-image,
+  #scene-9 .scene-image,
+  #scene-10 .scene-image {
+    object-fit: cover !important;
+    object-position: center center !important;
+  }
+}
+
+
+
+/* Family section: restore the translucent Apple Glass-style panel. */
+#scene-12 .family-copy{
+  background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.09)) !important;
+  color:#fff !important;
+  border:1px solid rgba(255,255,255,.38) !important;
+  box-shadow:0 18px 55px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.28) !important;
+  backdrop-filter: saturate(155%) !important;
+  -webkit-backdrop-filter: saturate(155%) !important;
+}
+#scene-12 .family-copy .eyebrow{color:#f3d99b !important;}
+#scene-12 .family-columns p{color:#fff !important;}
+#scene-12 .family-columns strong{color:#f3d99b !important;}
+@media(max-width:700px){
+  #scene-12 .family-copy{
+    background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.10)) !important;
+    border-color:rgba(255,255,255,.4) !important;
+    backdrop-filter: saturate(155%) !important;
+    -webkit-backdrop-filter: saturate(155%) !important;
+  }
+}
+
+/* Countdown placement: centred near the bottom of the photograph. */
+#scene-10 .scene-copy{
+  left:50% !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:12% !important;
+  width:max-content;
+  max-width:min(90vw,760px);
+  text-align:center !important;
+  transform:translate(-50%,22px) !important;
+}
+#scene-10.show-copy .scene-copy{
+  transform:translate(-50%,0) !important;
+}
+#scene-10 .countdown{
+  justify-content:center;
+}
+@media(max-width:700px){
+  #scene-10 .scene-copy{
+    left:50% !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:14% !important;
+    width:90vw;
+    max-width:90vw;
+    text-align:center !important;
+    transform:translate(-50%,18px) !important;
+  }
+  #scene-10.show-copy .scene-copy{
+    transform:translate(-50%,0) !important;
+  }
+  #scene-10 .countdown{justify-content:center;gap:clamp(8px,2.5vw,14px)}
+}
+
+/* Match the family names to the clean sans-serif typography used in the other glass panels. */
+#scene-12 .family-columns p,
+#scene-12 .family-columns strong{
+  font-family:var(--sans) !important;
+  font-weight:400 !important;
+  letter-spacing:.015em;
+}
+#scene-12 .family-columns p{line-height:1.7;}
+#scene-12 .family-columns strong{font-weight:500 !important;letter-spacing:.04em;}
+
+/* Family typography: match the Playfair Display heading treatment used by “Counting down to forever.” */
+#scene-12 .family-columns p,
+#scene-12 .family-columns strong{
+  font-family:var(--serif) !important;
+  font-weight:400 !important;
+  letter-spacing:-.025em !important;
+  line-height:1.5 !important;
+}
+#scene-12 .family-columns p{font-size:clamp(18px,1.65vw,23px) !important;}
+#scene-12 .family-columns strong{font-size:clamp(16px,1.35vw,19px) !important;color:#f3d99b !important;}
+@media(max-width:700px){
+  #scene-12 .family-columns p{font-size:clamp(15px,4vw,18px) !important;line-height:1.45 !important;}
+  #scene-12 .family-columns strong{font-size:clamp(13px,3.5vw,15px) !important;line-height:1.45 !important;}
+}
+
+/* ================================================================
+   SCROLL-DRIVEN CINEMATIC REDESIGN — Apple UI meets film language
+   ================================================================ */
+:root{--accent:#e8d3a4;--glass:rgba(255,255,255,.13)}
+html{scroll-behavior:auto;scroll-snap-type:y proximity;overscroll-behavior-y:contain}
+body{overflow-x:hidden;background:#11110f}
+.scene{scroll-snap-align:start;scroll-snap-stop:normal;min-height:100svh;height:100svh;position:relative;isolation:isolate}
+.scene::after{content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;background:linear-gradient(180deg,rgba(9,9,9,.12),transparent 28%,transparent 65%,rgba(9,9,9,.28));opacity:.8}
+.scene-image{transform:scale(1.12);filter:saturate(.92) brightness(.88);will-change:transform,filter,clip-path}
+.scene-copy{opacity:1;visibility:visible;translate:0 var(--copy-shift,0px);will-change:translate,opacity,filter;pointer-events:none}
+.scene.is-current .scene-copy{pointer-events:auto}
+.hero-copy{opacity:1;visibility:visible;transform:translate(-50%,-50%)!important}
+.hero h1{font-family:'Oswald',sans-serif;font-weight:700;letter-spacing:.015em}
+.hero h1 span,.hero h1 i{-webkit-text-fill-color:#fff!important;color:#fff!important}
+/* Content sits in the scene from the beginning; ScrollTrigger controls its entrance. */
+.scene-copy{transition:none}
+.scene-copy h1,.scene-copy h2,.scene-copy .eyebrow,.scene-copy .body-copy{will-change:transform,opacity,filter}
+.scene-index{font-variant-numeric:tabular-nums;letter-spacing:.22em;text-shadow:0 2px 12px #0008}
+.motion-canvas{position:fixed;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;opacity:.72}
+.noise{z-index:4;opacity:.035}
+.music-toggle{z-index:70;background:rgba(18,18,17,.46);border-color:rgba(255,255,255,.34)}
+.scene-nav{z-index:65;bottom:18px;background:rgba(18,18,17,.42);border-color:rgba(255,255,255,.30);box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.scene-nav button{font-size:13px;letter-spacing:.08em}
+.scene-nav button span{font-size:8px}
+.story-progress{position:fixed;z-index:64;left:25px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.78);font:500 8px var(--sans);letter-spacing:.16em;writing-mode:vertical-rl}
+.story-progress__track{height:116px;width:1px;background:rgba(255,255,255,.28);position:relative;overflow:hidden}
+.story-progress__fill{position:absolute;left:0;top:0;width:100%;height:7.7%;background:#e8d3a4;transition:height .35s ease}
+.story-progress__count{transform:rotate(180deg)}
+/* Refined scene copy glass: light catches the edge without obscuring the photographs. */
+.scene-copy:not(.hero-copy){background:linear-gradient(135deg,rgba(20,20,19,.60),rgba(20,20,19,.28))!important;border:1px solid rgba(255,255,255,.25)!important;box-shadow:0 20px 70px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.14)!important;backdrop-filter: saturate(135%)!important;-webkit-backdrop-filter: saturate(135%)!important}
+#scene-12 .family-copy{background:linear-gradient(135deg,rgba(255,255,255,.22),rgba(255,255,255,.09))!important;border-color:rgba(255,255,255,.38)!important;backdrop-filter: saturate(155%)!important;-webkit-backdrop-filter: saturate(155%)!important}
+#scene-12 .family-columns p,#scene-12 .family-columns strong{font-family:var(--serif)!important}
+#scene-12 .family-columns p{font-size:clamp(18px,1.65vw,23px)!important;line-height:1.5!important;color:#fff!important}
+#scene-12 .family-columns strong{font-size:clamp(16px,1.35vw,19px)!important;color:#f3d99b!important}
+#scene-10 .scene-copy{left:50%!important;right:auto!important;top:auto!important;bottom:12%!important;transform:translateX(-50%)!important;text-align:center!important}
+#scene-10 .countdown{justify-content:center}
+/* Story moments: allow the photographic plane to feel larger than the viewport. */
+#scene-5 .scene-image,#scene-6 .scene-image,#scene-7 .scene-image{object-fit:cover;object-position:center}
+#scene-5 .scene-copy,#scene-6 .scene-copy,#scene-7 .scene-copy{max-width:min(650px,48vw)}
+#scene-12 .family-copy{bottom:13%!important}
+@media(max-width:700px){
+  html{scroll-snap-type:y proximity}
+  .scene{height:100svh;min-height:100svh}
+  .story-progress{left:9px;gap:7px}.story-progress__track{height:76px}.story-progress__count{font-size:7px}
+  .scene-nav{bottom:10px;padding:8px 13px;gap:13px}
+  .music-toggle{top:10px;right:10px}
+  .scene-copy:not(.hero-copy){max-width:90vw!important;width:auto!important;padding:14px 16px!important;border-radius:18px!important}
+  #scene-3 .scene-copy,#scene-4 .scene-copy,#scene-5 .scene-copy,#scene-7 .scene-copy,#scene-8 .scene-copy,#scene-9 .scene-copy,#scene-11 .scene-copy{left:5vw!important;right:5vw!important;top:auto!important;bottom:13%!important;max-width:90vw!important;text-align:left!important}
+  #scene-6 .scene-copy{left:50%!important;right:auto!important;top:auto!important;bottom:13%!important;max-width:90vw!important}
+  #scene-10 .scene-copy{left:50%!important;right:auto!important;top:auto!important;bottom:13%!important;width:92vw!important;max-width:92vw!important}
+  #scene-12 .family-copy{left:50%!important;right:auto!important;top:auto!important;bottom:13%!important;width:94vw!important;max-width:94vw!important;padding:12px 13px!important}
+  #scene-12 .family-columns{gap:14px}
+  #scene-12 .family-columns p{font-size:clamp(14px,3.8vw,18px)!important;line-height:1.45!important}
+  #scene-12 .family-columns strong{font-size:clamp(12px,3.1vw,15px)!important;line-height:1.4!important}
+  #scene-13 .scene-copy{left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;transform:translate(-50%,-50%)!important;width:90vw!important;max-width:90vw!important;text-align:center!important}
+  #scene-9 .map-frame{height:118px}
+  #scene-9 .station-list p{font-size:11px}
+  #scene-8 .date-lockup strong{font-size:76px}
+  #scene-8 .date-lockup span{font-size:12px}
+  .motion-canvas{opacity:.48}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto;scroll-snap-type:y proximity}
+  .scene-image,.scene-copy{transition:none!important;animation:none!important;transform:none!important;filter:none!important}
+  .motion-canvas{display:none}
+}
+
+/* Dedicated Bride and Groom biography + photo carousel chapters */
+.profile-scene{background:radial-gradient(ellipse at 75% 35%,#493d2d66,transparent 48%),linear-gradient(130deg,#171513,#090909 75%);}
+.profile-layout{position:absolute;inset:7vh 5vw;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:4vw;align-items:center;}
+.profile-copy{position:relative!important;inset:auto!important;max-width:none!important;width:auto!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;}
+.profile-copy h2{font-size:clamp(34px,3.5vw,56px);line-height:1.12;margin:12px 0 22px;}
+.profile-copy .body-copy{font-size:clamp(13px,1.05vw,16px);line-height:1.85;color:#e0d8ce;}
+.profile-carousel{position:relative;height:min(76vh,720px);min-height:430px;border:1px solid #ffffff25;border-radius:22px;overflow:hidden;background:#24211d;box-shadow:0 30px 90px #0008;}
+.profile-slide{position:absolute;inset:0;opacity:0;transform:scale(1.04);transition:opacity .9s ease,transform 5s ease;}
+.profile-slide.active{opacity:1;transform:scale(1);}.profile-slide img{width:100%;height:100%;object-fit:contain;display:block;background:#151411;}
+.profile-carousel:after{content:"";position:absolute;inset:48% 0 0;background:linear-gradient(transparent,#0008);pointer-events:none;}
+.profile-carousel-caption{position:absolute;z-index:2;left:22px;bottom:72px;font-size:10px;letter-spacing:.18em;color:#fff;text-transform:uppercase;}
+.profile-carousel-controls{position:absolute;z-index:3;left:20px;right:20px;bottom:18px;display:flex;justify-content:space-between;align-items:center;color:white;font-size:11px;letter-spacing:.14em;}
+.profile-carousel-controls button{width:38px;height:38px;border:1px solid #ffffff80;border-radius:50%;background:#1118;color:#fff;font-size:22px;margin-left:7px;cursor:pointer;backdrop-filter:;}
+.profile-dots{position:absolute;z-index:3;bottom:34px;left:50%;transform:translateX(-50%);display:flex;gap:5px;}.profile-dots i{width:5px;height:5px;border-radius:5px;background:#ffffff70}.profile-dots i.active{width:17px;background:#fff}
+@media(max-width:700px){.profile-layout{inset:7vh 5vw 10vh;display:flex;flex-direction:column;justify-content:center;gap:16px;}.profile-copy{padding:0!important;max-height:43%;overflow:auto;}.profile-copy h2{font-size:clamp(27px,7vw,40px);margin:6px 0 10px;}.profile-copy .body-copy{font-size:12px;line-height:1.55;}.profile-carousel{width:100%;height:43%;min-height:220px;flex:0 0 43%;}.profile-carousel-caption{left:14px;bottom:60px;font-size:8px}.profile-carousel-controls{left:13px;right:13px;bottom:10px}.profile-carousel-controls button{width:32px;height:32px}.profile-dots{bottom:23px}}
+@media(prefers-reduced-motion:reduce){.profile-slide{transition:none}}
+
+/* Fix family typography on the actual fourteenth scene. */
+#scene-14 .family-copy{
+  background:linear-gradient(135deg,rgba(20,20,19,.58),rgba(20,20,19,.38))!important;
+  border:1px solid rgba(255,255,255,.34)!important;
+  box-shadow:0 18px 55px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.16)!important;
+  backdrop-filter: saturate(145%)!important;
+  -webkit-backdrop-filter: saturate(145%)!important;
+}
+#scene-14 .family-copy .eyebrow,
+#scene-14 .family-columns p{color:#fff!important;text-shadow:0 2px 12px rgba(0,0,0,.55)!important;}
+#scene-14 .family-columns strong{color:#f3d99b!important;text-shadow:0 2px 10px rgba(0,0,0,.55)!important;}
+#scene-14 .family-columns p{font-family:var(--serif)!important;font-size:clamp(18px,1.65vw,23px)!important;line-height:1.5!important;}
+#scene-14 .family-columns strong{font-family:var(--serif)!important;font-size:clamp(16px,1.35vw,19px)!important;}
+#scene-14 .family-copy{z-index:5!important;opacity:1!important;visibility:visible!important;}
+#scene-11 .map-frame{position:relative;z-index:4;}
+#scene-11 .map-frame iframe{display:block;position:relative;z-index:5;min-height:100%;}
+@media(max-width:700px){
+  #scene-14 .family-columns p{font-size:clamp(15px,4vw,18px)!important;line-height:1.45!important;}
+  #scene-14 .family-columns strong{font-size:clamp(13px,3.5vw,15px)!important;line-height:1.4!important;}
+}
+
+/* Final mobile composition pass based on the 15-scene review. */
+@media (max-width:700px){
+  /* Profile chapters: biography copy and carousel share the same centered axis. */
+  #scene-4 .profile-layout,
+  #scene-6 .profile-layout{
+    inset:6vh 5vw 10vh!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    align-items:center!important;
+    gap:12px!important;
+    width:auto!important;
+  }
+  #scene-4 .profile-copy,
+  #scene-6 .profile-copy{
+    width:100%!important;
+    max-width:100%!important;
+    max-height:35%!important;
+    overflow-y:auto!important;
+    text-align:center!important;
+    padding:0 5px!important;
+    margin:0 auto!important;
+  }
+  #scene-4 .profile-copy h2,
+  #scene-6 .profile-copy h2{
+    font-size:clamp(25px,6.3vw,34px)!important;
+    line-height:1.12!important;
+    margin:4px 0 8px!important;
+  }
+  #scene-4 .profile-copy h2 em,
+  #scene-6 .profile-copy h2 em{display:block;font-size:.82em;margin-top:3px}
+  #scene-4 .profile-copy .body-copy,
+  #scene-6 .profile-copy .body-copy{font-size:11px!important;line-height:1.42!important;margin:0 auto!important;max-width:100%!important}
+  #scene-4 .profile-carousel,
+  #scene-6 .profile-carousel{
+    width:100%!important;
+    max-width:100%!important;
+    height:46%!important;
+    min-height:0!important;
+    flex:0 0 46%!important;
+    margin:0 auto!important;
+  }
+  #scene-4 .profile-carousel-caption,
+  #scene-6 .profile-carousel-caption{left:13px!important;bottom:55px!important;font-size:8px!important}
+
+  /* Scene 7: move the caption above the faces. */
+  #scene-7 .scene-copy{
+    left:50%!important;right:auto!important;top:8%!important;bottom:auto!important;
+    width:88vw!important;max-width:88vw!important;text-align:center!important;
+    transform:translate(-50%,18px)!important;
+  }
+  #scene-7.show-copy .scene-copy{transform:translate(-50%,0)!important}
+
+  /* Scene 8: keep the engagement caption within the image and centered. */
+  #scene-8 .scene-copy{
+    left:50%!important;right:auto!important;top:50%!important;bottom:auto!important;
+    width:88vw!important;max-width:88vw!important;text-align:center!important;
+    transform:translate(-50%,calc(-50% + 18px))!important;
+  }
+  #scene-8.show-copy .scene-copy{transform:translate(-50%,-50%)!important}
+
+  /* Scene 11: keep venue details at the top and leave the lower photo visible. */
+  #scene-11 .scene-image{object-position:46% center!important}
+  #scene-11 .venue-copy{
+    left:50%!important;right:auto!important;top:5%!important;bottom:auto!important;
+    width:88vw!important;max-width:88vw!important;max-height:52vh!important;
+    overflow-y:auto!important;text-align:center!important;
+    transform:translate(-50%,18px)!important;
+    padding:10px 13px!important;
+  }
+  #scene-11.show-copy .venue-copy{transform:translate(-50%,0)!important}
+  #scene-11 .venue-copy h2{font-size:34px!important;margin:0 0 2px!important}
+  #scene-11 .venue-copy .body-copy{font-size:13px!important;margin:0 auto!important}
+  #scene-11 .map-frame{height:92px!important;margin:7px auto 4px!important}
+  #scene-11 .station-list{margin:2px auto!important}
+  #scene-11 .station-list p{font-size:9px!important;padding:4px 0!important}
+
+  /* Scene 13: invitation copy sits at the top, clear of the couple. */
+  #scene-13 .scene-copy{
+    left:50%!important;right:auto!important;top:7%!important;bottom:auto!important;
+    width:90vw!important;max-width:90vw!important;text-align:center!important;
+    transform:translate(-50%,18px)!important;
+  }
+  #scene-13.show-copy .scene-copy{transform:translate(-50%,0)!important}
+
+  /* Scene 14: give both family columns room to breathe. */
+  #scene-14 .family-copy{bottom:7%!important;width:94vw!important;max-width:94vw!important;padding:16px 17px!important}
+  #scene-14 .family-columns{grid-template-columns:1fr 1fr!important;gap:20px!important;align-items:start!important}
+  #scene-14 .family-columns>div{text-align:center!important;min-width:0!important}
+  #scene-14 .family-columns p{font-size:clamp(14px,3.7vw,17px)!important;line-height:1.7!important;overflow-wrap:normal!important;word-break:normal!important;margin-bottom:8px!important}
+  #scene-14 .family-columns strong{font-size:clamp(11px,3vw,13px)!important;line-height:1.55!important;letter-spacing:.01em!important}
+
+  /* Scene 15: closing message moves to the top, away from the couple. */
+  #scene-15 .closing-copy{
+    left:50%!important;right:auto!important;top:8%!important;bottom:auto!important;
+    width:90vw!important;max-width:90vw!important;text-align:center!important;
+    transform:translate(-50%,18px)!important;
+  }
+  #scene-15.show-copy .closing-copy{transform:translate(-50%,0)!important}
+  #scene-15 .closing-copy h2{font-size:clamp(30px,8vw,43px)!important}
+}
+
+
+/* Mobile performance: keep the cinematic feel with lightweight GPU-friendly motion. */
+@media (max-width:700px), (pointer:coarse) {
+  html { scroll-behavior:auto; }
+  /* Keep slow image push-ins, but avoid scroll-linked filters, blur and clip-paths. */
+  .scene-image {
+    transform:scale(1.025)!important;
+    transition:transform 1.25s cubic-bezier(.2,.7,.2,1), object-position .4s ease!important;
+    filter:saturate(.94) brightness(.94)!important;
+    will-change:transform!important;
+  }
+  .scene.is-current .scene-image { transform:scale(1.065)!important; }
+  .scene.show-copy .scene-image { filter:saturate(.92) brightness(.88)!important; }
+  /* Soft text reveal instead of heavy blur/scroll-scrub animation. */
+  .scene-copy {
+    transition:opacity .48s ease, transform .58s cubic-bezier(.2,.7,.2,1)!important;
+    will-change:opacity,transform!important;
+    backdrop-filter:none!important; -webkit-backdrop-filter:none!important;
+  }
+  .profile-slide { transition:opacity .65s ease,transform 1.8s ease!important; }
+  .profile-slide.is-active { transform:scale(1)!important; }
+  .motion-canvas { display:none!important; }
+  #scene-4 .profile-layout, #scene-6 .profile-layout {
+    inset:5vh 5vw 9vh!important; justify-content:center!important; align-items:center!important;
+  }
+  #scene-4 .profile-copy, #scene-6 .profile-copy {
+    text-align:center!important; margin-left:auto!important; margin-right:auto!important;
+    align-self:center!important; width:100%!important;
+  }
+  #scene-4 .profile-copy h2 em, #scene-6 .profile-copy h2 em {
+    display:block!important; margin-top:4px!important;
+  }
+  #scene-8 .scene-copy {
+    top:7%!important; bottom:auto!important; left:50%!important; right:auto!important;
+    transform:translate(-50%,0)!important; width:90vw!important; max-width:90vw!important;
+    text-align:center!important; padding:14px 16px!important;
+    background:rgba(15,14,13,.48)!important;
+  }
+  #scene-8.show-copy .scene-copy { transform:translate(-50%,0)!important; }
+  #scene-14 .family-copy { bottom:12%!important; }
+  #scene-15 .closing-copy {
+    top:50%!important; bottom:auto!important; left:50%!important; right:auto!important;
+    transform:translate(-50%,-50%)!important; width:90vw!important; max-width:90vw!important;
+    text-align:center!important;
+  }
+  #scene-15.show-copy .closing-copy { transform:translate(-50%,-50%)!important; }
+}
+
+/* The final closing title is deliberately centred on the frame. */
+#scene-15 .closing-copy {
+  left:50%!important; right:auto!important; top:50%!important; bottom:auto!important;
+  transform:translate(-50%,-50%)!important; width:min(900px,84vw); max-width:84vw;
+  text-align:center!important;
+}
+#scene-15.show-copy .closing-copy { transform:translate(-50%,-50%)!important; }
+
+
+/* Final profile carousel centring: prevent inherited scene/GSAP offsets on phones. */
+@media (max-width:700px), (pointer:coarse) {
+  #scene-4 .profile-layout, #scene-6 .profile-layout {
+    position:absolute!important; left:0!important; right:0!important; top:0!important; bottom:0!important;
+    width:100%!important; height:100%!important; box-sizing:border-box!important;
+    padding: max(64px, 8vh) 6vw max(54px, 7vh)!important; margin:0!important;
+    display:flex!important; flex-direction:column!important; justify-content:center!important;
+    align-items:center!important; gap:clamp(10px,2vh,18px)!important; transform:none!important;
+  }
+  #scene-4 .profile-copy, #scene-6 .profile-copy {
+    position:relative!important; inset:auto!important; left:auto!important; right:auto!important; top:auto!important; bottom:auto!important;
+    display:block!important; flex:0 1 auto!important; width:100%!important; max-width:100%!important;
+    min-width:0!important; max-height:34%!important; height:auto!important; margin:0 auto!important;
+    padding:0!important; box-sizing:border-box!important; overflow-y:auto!important;
+    text-align:center!important; transform:none!important; translate:none!important;
+    opacity:1!important; visibility:visible!important;
+  }
+  #scene-4 .profile-copy h2, #scene-6 .profile-copy h2,
+  #scene-4 .profile-copy .eyebrow, #scene-6 .profile-copy .eyebrow,
+  #scene-4 .profile-copy .body-copy, #scene-6 .profile-copy .body-copy {
+    width:100%!important; max-width:100%!important; margin-left:auto!important; margin-right:auto!important;
+    text-align:center!important; overflow-wrap:anywhere;
+  }
+  #scene-4 .profile-carousel, #scene-6 .profile-carousel {
+    position:relative!important; inset:auto!important; left:auto!important; right:auto!important; top:auto!important; bottom:auto!important;
+    display:block!important; flex:0 0 43%!important; width:100%!important; max-width:100%!important;
+    height:43%!important; min-height:0!important; margin:0 auto!important; transform:none!important;
+  }
+}
+
+.top-controls{position:fixed;z-index:70;top:18px;right:22px;display:flex;align-items:center;gap:8px}
+.top-controls .music-toggle{position:static}
+
+/* Desktop-only composition refinements requested for the PC layout.
+   The mobile breakpoint below 700px is intentionally left untouched. */
+@media (min-width: 701px) {
+  /* Opening title: lift it slightly above the subjects' heads. */
+  #scene-1 .hero-copy {
+    top: 46.5% !important;
+  }
+
+  /* Bride and Groom biography copy: align vertically with the carousel frame,
+     with a small downward adjustment for visual balance. */
+  #scene-4 .profile-layout,
+  #scene-6 .profile-layout {
+    align-items: center;
+  }
+  #scene-4 .profile-copy,
+  #scene-6 .profile-copy {
+    align-self: center;
+    width: 100%;
+    margin-top: 3vh;
+    translate: 0 0 !important;
+  }
+
+  /* First meeting: move the line to the upper-right corner. */
+  #scene-7 .scene-copy {
+    left: auto !important;
+    right: 6vw !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    max-width: 40vw !important;
+    text-align: right !important;
+  }
+
+  /* Engagement: centred near the top, safely inside the desktop frame. */
+  #scene-8 .scene-copy {
+    left: 8vw !important;
+    right: auto !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    width: 84vw;
+    max-width: 84vw !important;
+    text-align: center !important;
+  }
+
+  /* The Promise: place the copy at the lower-right. */
+  #scene-9 .scene-copy {
+    left: auto !important;
+    right: 6vw !important;
+    top: auto !important;
+    bottom: 9vh !important;
+    max-width: 44vw !important;
+    text-align: right !important;
+  }
+
+  /* Save the Date: lower-left placement. */
+  #scene-10 .scene-copy {
+    left: 6vw !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 8vh !important;
+    max-width: 43vw !important;
+    text-align: left !important;
+  }
+
+  /* Family note: top-centre, above the family photograph. */
+  #scene-14 .family-copy {
+    left: calc(50% - min(380px, 44vw)) !important;
+    right: auto !important;
+    top: 6vh !important;
+    bottom: auto !important;
+    width: min(760px, 88vw) !important;
+    max-width: 88vw !important;
+    text-align: center !important;
+  }
+}
+
+/* Desktop correction pass 2 — explicit scene composition overrides.
+   These rules are intentionally scoped to desktop so mobile layouts remain unchanged. */
+@media screen and (min-width: 701px) {
+  /* Opening: lift title clearly above the subjects' heads. */
+  #scene-1 .hero-copy,
+  #scene-1.show-copy .hero-copy {
+    top: 43% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  /* Bride and Groom: profile copy is a grid item, not an absolutely positioned scene overlay.
+     Align it vertically with the carousel and nudge it down to match the carousel's visual centre. */
+  #scene-4 .profile-layout,
+  #scene-6 .profile-layout {
+    inset: 7vh 5vw !important;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+    align-items: center !important;
+    column-gap: 4vw !important;
+  }
+  #scene-4 .profile-copy,
+  #scene-6 .profile-copy {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    align-self: center !important;
+    justify-self: stretch !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 5vh 0 0 !important;
+    transform: none !important;
+    translate: none !important;
+  }
+  #scene-4 .profile-carousel,
+  #scene-6 .profile-carousel {
+    align-self: center !important;
+    margin: 0 !important;
+  }
+
+  /* Engagement: return to bottom-centre, fully inside the frame. */
+  #scene-8 .scene-copy,
+  #scene-8.show-copy .scene-copy {
+    left: 50% !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 8vh !important;
+    width: min(800px, 84vw) !important;
+    max-width: min(800px, 84vw) !important;
+    text-align: center !important;
+    transform: translate(-50%, 0) !important;
+  }
+
+  /* The Promise: bottom-right, with a little extra downward placement. */
+  #scene-9 .scene-copy,
+  #scene-9.show-copy .scene-copy {
+    left: auto !important;
+    right: 6vw !important;
+    top: auto !important;
+    bottom: 5vh !important;
+    width: min(560px, 42vw) !important;
+    max-width: min(560px, 42vw) !important;
+    text-align: right !important;
+    transform: translateY(0) !important;
+  }
+
+  /* Save the Date: left side, vertically centred toward the lower half, never outside viewport. */
+  #scene-10 .scene-copy,
+  #scene-10.show-copy .scene-copy {
+    left: 5vw !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: min(520px, 40vw) !important;
+    max-width: min(520px, 40vw) !important;
+    max-height: 82vh !important;
+    overflow: visible !important;
+    text-align: left !important;
+    transform: translateY(-42%) !important;
+  }
+
+  /* Family: centre the name panel precisely and lift it into the clear space above faces. */
+  #scene-14 .family-copy,
+  #scene-14.show-copy .family-copy {
+    left: 50% !important;
+    right: auto !important;
+    top: 4vh !important;
+    bottom: auto !important;
+    width: min(720px, 72vw) !important;
+    max-width: min(720px, 72vw) !important;
+    margin: 0 !important;
+    text-align: center !important;
+    transform: translate(-50%, 0) !important;
+  }
+  #scene-14 .family-columns {
+    justify-items: center !important;
+    text-align: center !important;
+    gap: 36px !important;
+  }
+  #scene-14 .family-columns > div {
+    width: 100% !important;
+    text-align: center !important;
+  }
+}
+
+
+/* Final desktop-only opening-title correction. Keep the title clearly above the
+   original centre point while preserving its horizontal centring. */
+@media screen and (min-width: 701px) {
+  #scene-1 .hero-copy,
+  #scene-1.show-copy .hero-copy {
+    top: 40% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+
+/* Final desktop title lift requested: approximately twice the previous adjustment. */
+@media screen and (min-width: 701px) {
+  #scene-1 .hero-copy,
+  #scene-1.show-copy .hero-copy {
+    top: 32% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+.venue-map-link{display:inline-block;margin:0 0 8px;color:var(--accent);font-size:11px;font-weight:600;letter-spacing:.14em;text-decoration:none;border-bottom:1px solid currentColor;padding:4px 0 6px}.venue-map-link:hover{opacity:.8}
+
+
+/* Desktop-only image framing and family-panel height refinement.
+   Mobile image positions and panel layout remain unchanged. */
+@media (min-width: 701px) {
+  #scene-10 .scene-image,
+  #scene-11 .scene-image,
+  #scene-12 .scene-image {
+    /* Shift the desktop image framing 5 percentage points to the right. */
+    object-position: 39% 50% !important;
+  }
+
+  #scene-14 .family-copy {
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+  }
+  #scene-14 .family-copy .eyebrow {
+    margin-bottom: 8px !important;
+  }
+  #scene-14 .family-columns p {
+    margin-bottom: 5px !important;
+  }
+}
+
+
+/* Desktop-only: physically shift the three scene background images right.
+   This uses element positioning (not just object-position), so the image framing
+   visibly moves while the image still covers the full scene. Mobile is untouched. */
+@media (min-width: 701px) {
+  #scene-10 .scene-image,
+  #scene-11 .scene-image,
+  #scene-12 .scene-image {
+    left: 5% !important;
+    width: 105% !important;
+    object-position: center 50% !important;
+  }
+}
+
+
+/* Scene 2: heading at the top centre on mobile; desktop placement is unchanged. */
+@media (max-width: 700px) {
+  #scene-2 .scene-copy {
+    left: 50% !important;
+    right: auto !important;
+    top: 5vh !important;
+    bottom: auto !important;
+    width: max-content !important;
+    max-width: 90vw !important;
+    text-align: center !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+
+/* Subtle guided-scroll cue: sits above the chapter controls and disappears
+   after the visitor takes manual control or reaches the final chapter. */
+.scroll-cue {
+  position: fixed;
+  z-index: 44;
+  left: 50%;
+  bottom: 82px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: rgba(255,255,255,.82);
+  text-shadow: 0 2px 12px rgba(0,0,0,.65);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity .45s ease, transform .45s ease;
+}
+.scroll-cue.is-hidden { opacity: 0; transform: translate(-50%, 8px); }
+.scroll-cue__label {
+  font: 500 8px var(--sans);
+  letter-spacing: .2em;
+  white-space: nowrap;
+}
+.scroll-cue__mobile { display: none; }
+.scroll-cue__arrow {
+  font: 300 24px/1 var(--sans);
+  animation: scrollCueFloat 1.6s ease-in-out infinite;
+}
+@keyframes scrollCueFloat {
+  0%, 100% { transform: translateY(0); opacity: .65; }
+  50% { transform: translateY(5px); opacity: 1; }
+}
+@media (max-width: 700px) {
+  .scroll-cue { bottom: 82px; }
+  .scroll-cue__desktop { display: none; }
+  .scroll-cue__mobile { display: inline; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue__arrow { animation: none; }
+  .scroll-cue { display: none; }
+}
+
+
+/* Scene 2: a quiet introductory line gives the About chapter a little more
+   context before the main story heading. */
+#scene-2 .about-intro-copy {
+  max-width: min(680px, 52vw);
+}
+#scene-2 .about-intro {
+  margin: 0 0 18px;
+  max-width: 540px;
+  font-family: var(--sans);
+  font-size: clamp(12px, 1.05vw, 15px);
+  line-height: 1.65;
+  letter-spacing: .035em;
+  color: rgba(255,255,255,.88);
+}
+#scene-2 .about-intro-copy h2 {
+  margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+  #scene-2 .scene-copy {
+    top: 12vh !important;
+    width: min(90vw, 520px) !important;
+    max-width: 90vw !important;
+    padding: 16px 18px !important;
+  }
+  #scene-2 .about-intro {
+    margin-bottom: 12px;
+    font-size: 11px;
+    line-height: 1.55;
+  }
+  #scene-2 .about-intro-copy h2 {
+    font-size: clamp(34px, 9vw, 46px);
+    line-height: 1.08;
+  }
+}
+
+
+/* Desktop-only: move the story and invitation copy into compact vertical
+   panels on the right, keeping the central faces and composition clear. */
+@media (min-width: 701px) {
+  #scene-2 .about-intro-copy,
+  #scene-13 .scene-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: min(340px, 28vw) !important;
+    max-width: 28vw !important;
+    padding: 26px 24px !important;
+    text-align: left !important;
+    transform: translateY(calc(-50% + 22px)) !important;
+  }
+
+  #scene-2.show-copy .about-intro-copy,
+  #scene-13.show-copy .scene-copy {
+    transform: translateY(-50%) !important;
+  }
+
+  #scene-2 .about-intro {
+    max-width: 100%;
+    margin-bottom: 16px;
+  }
+
+  #scene-2 .about-intro-copy h2,
+  #scene-13 .scene-copy h2 {
+    max-width: 100%;
+    line-height: 1.08;
+  }
+
+  #scene-13 .scene-copy .body-copy {
+    max-width: 100%;
+  }
+}
+
+
+/* Final desktop refinements for the story and invitation chapters. */
+@media (min-width: 701px) {
+  /* Page 2: compact right-side story panel. */
+  #scene-2 .about-intro-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: min(340px, 28vw) !important;
+    max-width: 28vw !important;
+    padding: 26px 24px !important;
+    text-align: left !important;
+    transform: translateY(-50%) !important;
+  }
+  #scene-2 .about-intro {
+    font-size: clamp(13px, 1.05vw, 15px);
+    line-height: 1.55;
+    margin: 0 0 15px;
+  }
+  #scene-2 .about-intro-copy h2 {
+    font-size: clamp(32px, 3vw, 44px);
+    line-height: 1.08;
+  }
+
+  /* Page 7: constrain the long sentence and reduce its type size. */
+  #scene-7 .scene-copy {
+    right: 5vw !important;
+    top: 8vh !important;
+    width: min(440px, 34vw) !important;
+    max-width: 34vw !important;
+    padding: 20px 22px !important;
+  }
+  #scene-7 .scene-copy h2 {
+    font-size: clamp(20px, 2vw, 29px) !important;
+    line-height: 1.18 !important;
+    letter-spacing: -.025em;
+  }
+
+  /* Page 8: a vertical invitation-style panel on the left. */
+  #scene-8 .scene-copy {
+    left: 5vw !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: min(310px, 25vw) !important;
+    max-width: 25vw !important;
+    padding: 28px 24px !important;
+    text-align: left !important;
+    transform: translateY(-50%) !important;
+  }
+  #scene-8 .scene-copy h2 {
+    font-size: clamp(32px, 3vw, 44px) !important;
+    line-height: 1.08 !important;
+  }
+  #scene-8 .engagement-date {
+    font-size: clamp(18px, 1.8vw, 25px) !important;
+    line-height: 1.4;
+  }
+
+  /* Page 10: fit the panel closer to its contents, avoiding excess width. */
+  #scene-10 .scene-copy {
+    left: 6vw !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: 8vh !important;
+    width: max-content !important;
+    max-width: 30vw !important;
+    padding: 22px 24px !important;
+  }
+  #scene-10 .date-lockup {
+    gap: 14px;
+    margin: 14px 0 8px;
+  }
+}
+
+
+/* Page 9 desktop: compact the Promise copy and anchor it to the lower-right. */
+@media (min-width: 701px) {
+  #scene-9 .scene-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: auto !important;
+    bottom: 7vh !important;
+    width: min(340px, 27vw) !important;
+    max-width: 27vw !important;
+    padding: 20px 22px !important;
+    text-align: right !important;
+    transform: none !important;
+  }
+  #scene-9 .scene-copy h2 {
+    font-size: clamp(28px, 2.7vw, 40px) !important;
+    line-height: 1.1 !important;
+  }
+}
+
+
+/* About opening line: small, warm-yellow uppercase text. */
+#scene-2 .about-intro {
+  color: #f3d99b !important;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+}
+
+/* Page 9 desktop: compact Promise copy anchored to the lower-right. */
+@media (min-width: 701px) {
+  #scene-9 .scene-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: auto !important;
+    bottom: 7vh !important;
+    width: min(300px, 23vw) !important;
+    max-width: 23vw !important;
+    padding: 18px 20px !important;
+    text-align: right !important;
+    transform: none !important;
+  }
+  #scene-9 .scene-copy h2 {
+    font-size: clamp(27px, 2.5vw, 36px) !important;
+    line-height: 1.08 !important;
+  }
+}
+
+
+/* Page 7 story emphasis: italic phrases in the same warm accent used elsewhere. */
+#scene-7 .story-highlight {
+  color: #f3d99b;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Mobile refinements: compact Page 7 copy and centre the Save the Date lockup. */
+@media (max-width: 700px) {
+  #scene-7 .scene-copy {
+    width: 78vw !important;
+    max-width: 78vw !important;
+    padding: 13px 15px !important;
+  }
+  #scene-7 .scene-copy h2 {
+    font-size: clamp(18px, 4.7vw, 24px) !important;
+    line-height: 1.28 !important;
+  }
+  #scene-10 .date-lockup {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  #scene-10 .date-lockup span {
+    text-align: center !important;
+  }
+}
+
+
+/* Page 7 desktop: widen the copy panel so the final phrase wraps more naturally. */
+@media (min-width: 701px) {
+  #scene-7 .scene-copy {
+    width: min(520px, 40vw) !important;
+    max-width: 40vw !important;
+    padding: 22px 24px !important;
+  }
+}
+
+
+/* Page 2 desktop: give the About text panel a little more room. */
+@media (min-width: 701px) {
+  #scene-2 .about-intro-copy {
+    width: min(400px, 31vw) !important;
+    max-width: 31vw !important;
+    padding: 30px 28px !important;
+  }
+}
+
+
+/* Desktop alignment pass: keep the story panels in the upper-right and give
+   complete phrases enough horizontal room to avoid awkward orphan words. */
+@media (min-width: 701px) {
+  #scene-2 .about-intro-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    width: min(560px, 42vw) !important;
+    max-width: min(560px, 42vw) !important;
+    padding: 28px 30px !important;
+    text-align: left !important;
+    transform: translateY(0) !important;
+  }
+  #scene-2 .about-intro {
+    max-width: none !important;
+    white-space: normal;
+  }
+  #scene-2 .about-intro-copy h2 {
+    white-space: nowrap;
+  }
+
+  #scene-8 .scene-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    width: min(440px, 34vw) !important;
+    max-width: min(440px, 34vw) !important;
+    padding: 24px 26px !important;
+    text-align: right !important;
+    transform: translateY(0) !important;
+  }
+  #scene-8 .scene-copy h2,
+  #scene-8 .engagement-date {
+    white-space: nowrap;
+  }
+
+  #scene-9 .scene-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    width: min(580px, 44vw) !important;
+    max-width: min(580px, 44vw) !important;
+    padding: 22px 26px !important;
+    text-align: right !important;
+    transform: translateY(0) !important;
+  }
+  #scene-9 .scene-copy h2 {
+    font-size: clamp(24px, 2.2vw, 30px) !important;
+    line-height: 1.15 !important;
+    white-space: nowrap;
+  }
+}
+
+
+/* Desktop-only final placement: Engagement top-left, Promise bottom-right. */
+@media (min-width: 701px) {
+  #scene-8 .scene-copy {
+    left: 5vw !important;
+    right: auto !important;
+    top: 8vh !important;
+    bottom: auto !important;
+    width: min(440px, 34vw) !important;
+    max-width: min(440px, 34vw) !important;
+    text-align: left !important;
+    transform: translateY(0) !important;
+  }
+
+  #scene-9 .scene-copy {
+    left: auto !important;
+    right: 5vw !important;
+    top: auto !important;
+    bottom: 7vh !important;
+    width: min(580px, 44vw) !important;
+    max-width: min(580px, 44vw) !important;
+    text-align: right !important;
+    transform: translateY(0) !important;
+  }
+}
+
+
+/* Scroll morph transition — mobile/tablet fallback.
+   Active-scene changes are driven by the existing IntersectionObserver. */
+@media (max-width: 700px), (pointer: coarse) {
+  .scene-image {
+    clip-path: inset(0% 0% 0% 0% round 0px);
+    transition:
+      transform 1.15s cubic-bezier(.2,.7,.2,1),
+      filter 1.15s ease,
+      clip-path 1.15s cubic-bezier(.2,.7,.2,1);
+  }
+  .scene:not(.is-current) .scene-image {
+    transform: scale(1.12);
+    filter: saturate(.82) brightness(.78);
+  }
+  .scene.is-current .scene-image {
+    transform: scale(1.025);
+    filter: saturate(1) brightness(.94);
+    clip-path: inset(0% 0% 0% 0% round 0px);
+  }
+}
+
+
+/* Mobile refinements: reveal more of the bride on Page 3 and enable
+   the image morph transition on touch devices without blur. */
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-3 .scene-image {
+    object-position: 68% center !important;
+  }
+
+  .scene-image {
+    clip-path: inset(8% 5% 8% 5% round 26px) !important;
+    transform: scale(1.12) !important;
+    transition:
+      transform 1.15s cubic-bezier(.2,.7,.2,1),
+      clip-path 1.15s cubic-bezier(.2,.7,.2,1),
+      filter 1.15s ease !important;
+    will-change: transform, clip-path, filter;
+  }
+
+  .scene.is-current .scene-image {
+    clip-path: inset(0% 0% 0% 0% round 0px) !important;
+    transform: scale(1.025) !important;
+    filter: saturate(.94) brightness(.94) !important;
+  }
+
+  .scene:not(.is-current) .scene-image {
+    clip-path: inset(8% 5% 8% 5% round 26px) !important;
+    transform: scale(1.12) !important;
+    filter: saturate(.82) brightness(.78) !important;
+  }
+}
+
+
+/* Glass text boxes: 20px background blur; image layers stay sharp. */
+
+.scene-copy {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+
+.about-intro-copy {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+
+.glass-card {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+
+.glass-panel {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+
+.info-card {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+
+.content-card {
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+
+/* Page 3 mobile focal-point correction: move the photo crop right to keep
+   the bride visible. Use a higher-specificity rule than earlier experiments. */
+@media screen and (max-width: 700px) {
+  #scene-3 > img.scene-image {
+    object-fit: cover !important;
+    object-position: 88% 50% !important;
+  }
+}
+
+
+/* Mobile-only swipe affordance for the Bride and Groom photo carousels. */
+@media screen and (max-width: 700px) {
+  [data-carousel] .profile-slides {
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
