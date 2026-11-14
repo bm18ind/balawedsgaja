@@ -1403,3 +1403,21 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
 
 /* Desktop photographs are positioned once by script.js; no CSS easing needed. */
 @media (min-width:701px) and (pointer:fine){html.stage .scene-image{transition:none}}
+
+/* Phone readability: larger story text on the Bride and Groom pages (4 and 6).
+   The size follows the screen width but backs off on short screens so the
+   photo carousel always keeps a comfortable share of the page. */
+@media (max-width:700px), (pointer:coarse) {
+  #scene-4 .profile-copy .body-copy,
+  #scene-6 .profile-copy .body-copy{font-size:clamp(11.5px,min(3.85vw,1.95vh),15px)!important;line-height:1.55!important}
+  #scene-4 .profile-copy,
+  #scene-6 .profile-copy{max-height:none!important;flex:0 0 auto!important;padding:10px 13px!important}
+  #scene-4 .profile-carousel,
+  #scene-6 .profile-carousel{flex:1 1 0!important;height:auto!important;min-height:130px!important}
+}
+@media (max-height:600px) and (max-width:700px) {
+  #scene-4 .profile-copy .body-copy,
+  #scene-6 .profile-copy .body-copy{font-size:11px!important;line-height:1.5!important}
+  #scene-4 .profile-copy,
+  #scene-6 .profile-copy{padding:6px 11px!important}
+}
