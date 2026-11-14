@@ -1319,3 +1319,63 @@ body{overflow-x:hidden;background:#11110f}
     filter: none !important;
   }
 }
+
+
+/* Page 12 refinements:
+   Mobile: lift the background photograph by 7px.
+   Desktop: shrink the glass copy panel to its content width without changing typography. */
+@media (max-width: 700px) {
+  #scene-12 .scene-image {
+    transform: translateY(-7px) scale(1.015) !important;
+  }
+  #scene-12:not(.is-current) .scene-image {
+    transform: translateY(-7px) scale(1.04) !important;
+  }
+}
+
+
+
+
+/* Page 12 desktop: make the countdown panel taller/narrower.
+   Typography sizes are intentionally unchanged. */
+@media (min-width: 701px) {
+  #scene-12 .scene-copy {
+    width: min(430px, 34vw) !important;
+    max-width: min(430px, 34vw) !important;
+    box-sizing: border-box !important;
+  }
+  #scene-12 .scene-copy h2 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #scene-12 .countdown {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 18px 24px !important;
+    width: 100% !important;
+  }
+  #scene-12 .countdown > div {
+    flex: 0 0 calc(50% - 12px) !important;
+    min-width: 0 !important;
+  }
+}
+
+
+/* Page 12 desktop: keep all four countdown units on one horizontal row.
+   Preserve the existing number and label font sizes. */
+@media (min-width: 701px) {
+  #scene-12 #countdown {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  #scene-12 #countdown > div {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+}
