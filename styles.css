@@ -1326,10 +1326,10 @@ body{overflow-x:hidden;background:#11110f}
    Desktop: shrink the glass copy panel to its content width without changing typography. */
 @media (max-width: 700px) {
   #scene-12 .scene-image {
-    transform: translateY(-7px) scale(1.015) !important;
+    transform: translateY(-17px) scale(1.015) !important;
   }
   #scene-12:not(.is-current) .scene-image {
-    transform: translateY(-7px) scale(1.04) !important;
+    transform: translateY(-17px) scale(1.04) !important;
   }
 }
 
