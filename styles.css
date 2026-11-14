@@ -1470,3 +1470,28 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     word-break: normal !important;
   }
 }
+
+
+/* Mobile cinematic background drift: each chapter gets a slow, subtle push-in.
+   The image settles at its resting scale when inactive and gently enlarges
+   while the chapter is current. Page 12 keeps its existing vertical framing. */
+@media (max-width: 700px), (pointer: coarse) {
+  .scene-image {
+    transform: scale(1.018) !important;
+    transition: transform 8s cubic-bezier(.2,.7,.2,1) !important;
+    will-change: transform !important;
+  }
+  .scene.is-current .scene-image {
+    transform: scale(1.052) !important;
+  }
+  #scene-12 .scene-image,
+  #scene-12:not(.is-current) .scene-image {
+    transform: translate3d(0, -47px, 0) scale(1.018) !important;
+  }
+  #scene-12.is-current .scene-image {
+    transform: translate3d(0, -47px, 0) scale(1.052) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-image { transition: none !important; }
+}
