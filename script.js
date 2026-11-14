@@ -1,10 +1,38 @@
 (() => {
   const scenes = [...document.querySelectorAll('[data-scene]')];
+  const story = document.getElementById('story');
+  const root = document.documentElement;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
   const prevButton = document.getElementById('prevScene');
   const nextButton = document.getElementById('nextScene');
   let activeIndex = 0;
+  let scrollRatio = 0;
+
+  // ---------------------------------------------------------------------------
+  // Page transitions ("stage" mode)
+  // Every chapter is stacked on one fixed stage. Moving between chapters plays one
+  // directed transition on desktop and mobile alike: the outgoing text lifts away,
+  // the next photograph opens with a soft wipe and a slow settle, and the new text
+  // follows a beat later. If the browser cannot animate this (or the visitor prefers
+  // reduced motion) the page falls back to ordinary scrolling, exactly as before.
+  // ---------------------------------------------------------------------------
+  const canAnimate = 'animate' in Element.prototype && !!(window.CSS && CSS.supports && CSS.supports('clip-path', 'inset(0% 0% 0% 0% round 0px)'));
+  const stage = !reducedMotion && canAnimate && !!story && scenes.length > 1;
+
+  // Tuning: durations are in milliseconds.
+  const T = {
+    wipe: isMobile ? 900 : 1050,       // photograph reveal
+    wipeDelay: 140,                    // outgoing text leaves first
+    copyAt: isMobile ? 760 : 880,      // when the new text begins, measured from the start
+    stagger: 85,                       // gap between lines of text
+    child: 700,                        // each line's fade and rise
+    cooldown: 220,                     // quiet time before the next change is accepted
+    drift: isMobile ? 7000 : 9500      // slow cinematic push-in on each photograph
+  };
+  const EASE_WIPE = 'cubic-bezier(.77,0,.18,1)';
+  const EASE_OUT = 'cubic-bezier(.16,1,.3,1)';
+
   // Guided auto-advance: give each chapter time to be viewed, but hand over
   // control permanently as soon as the visitor interacts with the page.
   const scrollCue = document.getElementById('scrollCue');
@@ -40,18 +68,30 @@
     document.addEventListener(type, pauseAutoAdvance, { passive: type !== 'keydown', capture: true });
   });
 
+  let busy = false;
+  let lockUntil = 0;
+  let transitionTo = () => {};
+  const clamp = index => Math.max(0, Math.min(scenes.length - 1, index));
+  const wait = ms => new Promise(resolve => window.setTimeout(resolve, ms));
+  const nextFrames = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
   const goToScene = (index) => {
-    const target = Math.max(0, Math.min(scenes.length - 1, index));
-    scenes[target].scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+    const target = clamp(index);
+    if (!stage) {
+      scenes[target].scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
+      return;
+    }
+    if (busy || target === activeIndex) return;
+    transitionTo(target, target > activeIndex ? 1 : -1);
   };
 
-  function setActive(index) {
-    const nextIndex = Math.max(0, Math.min(scenes.length - 1, index));
+  function setActive(index, schedule = true) {
+    const nextIndex = clamp(index);
     const changed = nextIndex !== activeIndex;
     activeIndex = nextIndex;
     scenes.forEach((scene, i) => {
       scene.classList.toggle('is-current', i === activeIndex);
-      if (isMobile) scene.classList.toggle('show-copy', i === activeIndex);
+      if (isMobile && !stage) scene.classList.toggle('show-copy', i === activeIndex);
     });
     if (prevButton) prevButton.disabled = activeIndex === 0;
     if (nextButton) nextButton.disabled = activeIndex === scenes.length - 1;
@@ -59,103 +99,259 @@
     if (progress) progress.style.height = `${((activeIndex + 1) / scenes.length) * 100}%`;
     const count = document.querySelector('.story-progress__count');
     if (count) count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(scenes.length).padStart(2, '0')}`;
-    if (changed || autoAdvanceTimer === null) scheduleAutoAdvance();
+    if (stage) scrollRatio = activeIndex / Math.max(1, scenes.length - 1);
+    if (schedule && (changed || autoAdvanceTimer === null)) scheduleAutoAdvance();
   }
 
-  // Scroll-led visual storytelling. Every animation is tied to scroll position,
-  // so reversing the scroll reverses the image and typography movement as well.
-  if (window.gsap && window.ScrollTrigger && !reducedMotion && !isMobile) {
-    gsap.registerPlugin(ScrollTrigger);
-    scenes.forEach((scene, index) => {
+  if (stage) {
+    // ----- helpers -----------------------------------------------------------
+    const partsOf = scene => {
+      if (scene._parts) return scene._parts;
       const image = scene.querySelector('.scene-image');
       const copy = scene.querySelector('.scene-copy');
-      const title = copy?.querySelector('h1, h2');
-      const eyebrow = copy?.querySelector('.eyebrow');
-      const details = copy ? [...copy.querySelectorAll('p:not(.eyebrow), .date-lockup, .countdown, .calendar-wrap, .map-frame, .station-list, .family-columns, .back-to-top')] : [];
-
-      if (image) {
-        // Incoming photographs begin as softly rounded, inset frames and expand
-        // into full-bleed cinematic images as their chapters enter view.
-        // Scrubbing makes the morph reverse naturally when scrolling upwards.
-        gsap.fromTo(image,
-          {
-            scale: 1.22,
-            yPercent: 2.5,
-            clipPath: 'inset(10% 7% 10% 7% round 38px)',
-            borderRadius: '38px',
-            filter: 'saturate(.78) brightness(.68)'
-          },
-          {
-            scale: 1.015,
-            yPercent: -1,
-            clipPath: 'inset(0% 0% 0% 0% round 0px)',
-            borderRadius: '0px',
-            filter: 'saturate(1) brightness(.96)',
-            ease: 'none',
-            scrollTrigger: { trigger: scene, start: 'top bottom', end: 'bottom 18%', scrub: 1.25 }
-          }
-        );
-      }
-
+      let items = [];
       if (copy) {
-        // Pages 8 (Engagement) and 13 (Heartfelt Invitation): let the image arrive
-        // first, then reveal the copy after a deliberate three-second pause.
-        // The delay is cancelled if the visitor leaves the scene before it ends.
-        if (index === 7 || index === 12) {
-          let revealTimer = null;
-          gsap.set(copy, { autoAlpha: 0, y: 34, filter: '' });
-          const revealCopy = () => {
-            if (revealTimer) revealTimer.kill();
-            gsap.set(copy, { autoAlpha: 0, y: 34, filter: '' });
-            revealTimer = gsap.delayedCall([7, 12].includes(index) ? 0 : 3, () => {
-              gsap.to(copy, { autoAlpha: 1, y: 0, filter: '', duration: .8, ease: 'power2.out', overwrite: true });
-              if (title) gsap.fromTo(title, { letterSpacing: '.025em' }, { letterSpacing: '-.045em', duration: .65, ease: 'power2.out', overwrite: true });
-              if (eyebrow) gsap.fromTo(eyebrow, { x: -18, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .55, ease: 'power2.out', overwrite: true });
-              if (details.length) gsap.fromTo(details, { y: 20, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: .65, stagger: .07, ease: 'power2.out', overwrite: true });
-            });
-          };
-          ScrollTrigger.create({
-            trigger: scene,
-            start: 'top 58%',
-            end: 'bottom 35%',
-            onEnter: revealCopy,
-            onEnterBack: revealCopy,
-            onLeave: () => { if (revealTimer) revealTimer.kill(); },
-            onLeaveBack: () => { if (revealTimer) revealTimer.kill(); gsap.set(copy, { autoAlpha: 0 }); }
-          });
-        } else {
-          // Other pages retain their original scroll-synchronised text timing.
-          const tl = gsap.timeline({
-            scrollTrigger: { trigger: scene, start: 'top 78%', end: 'bottom 22%', scrub: 0.8 }
-          });
-          tl.fromTo(copy, { autoAlpha: 0, '--copy-shift': '48px', filter: '', scale: .975 }, { autoAlpha: 1, '--copy-shift': '0px', filter: '', scale: 1, duration: .42, ease: 'none' });
-          if (title) tl.fromTo(title, { letterSpacing: '.025em' }, { letterSpacing: '-.045em', duration: .22, ease: 'none' }, .12);
-          if (eyebrow) tl.fromTo(eyebrow, { x: -22, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: .2, ease: 'none' }, .2);
-          if (details.length) tl.fromTo(details, { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: .045, duration: .25, ease: 'none' }, .22);
-          tl.to(copy, { autoAlpha: 0, '--copy-shift': '-30px', filter: '', scale: 1.015, duration: .28, ease: 'none' }, .76);
+        const heroTitle = scene.classList.contains('hero') ? copy.querySelector('h1') : null;
+        if (heroTitle) items = [...heroTitle.children];
+        else {
+          items = [...copy.querySelectorAll('.eyebrow, h1, h2, p, .date-lockup, .countdown, .calendar-wrap, .map-frame, .venue-map-link, .station-list, .family-columns, .back-to-top')];
+          items = items.filter(el => !items.some(other => other !== el && other.contains(el)));
         }
       }
+      const extras = [...scene.querySelectorAll('.profile-carousel')];
+      items = items.concat(extras);
+      scene._parts = { image, copy, items, extras };
+      scene._anims = [];
+      scene._temp = [];
+      return scene._parts;
+    };
 
-      // The three central relationship photographs receive a slightly more
-      // expressive image-plane movement, like a restrained 2.5D film transition.
-      if ([4, 5, 6].includes(index) && image) {
-        gsap.to(image, {
-          scale: 1.085,
-          transformOrigin: index === 4 ? '48% 50%' : index === 5 ? '52% 46%' : '50% 50%',
-          ease: 'none',
-          scrollTrigger: { trigger: scene, start: 'top 70%', end: 'bottom 30%', scrub: 1.4 }
-        });
-      }
+    const track = (list, animation) => { list.push(animation); return animation; };
+    const cancelList = list => { list.splice(0).forEach(a => { try { a.cancel(); } catch (e) {} }); };
 
-      ScrollTrigger.create({
-        trigger: scene,
-        start: 'top center',
-        end: 'bottom center',
-        onEnter: () => setActive(index),
-        onEnterBack: () => setActive(index)
+    // Photographs: only neighbouring chapters are kept in the layout, so their
+    // images are fetched ahead of time without downloading everything at once.
+    const prime = scene => {
+      scene.style.display = '';
+      const { image } = partsOf(scene);
+      if (image && image.loading === 'lazy') image.loading = 'eager';
+    };
+
+    const refreshVisibility = () => {
+      scenes.forEach((scene, i) => {
+        const distance = Math.abs(i - activeIndex);
+        if (distance === 0) { prime(scene); scene.style.visibility = 'visible'; }
+        else if (distance === 1) { prime(scene); scene.style.visibility = 'hidden'; }
+        else { scene.style.display = 'none'; scene.style.visibility = 'hidden'; }
       });
-    });
-    ScrollTrigger.refresh();
+    };
+
+    const ready = async scene => {
+      prime(scene);
+      const { image } = partsOf(scene);
+      const jobs = [nextFrames()];
+      if (image) {
+        if (!image.complete || !image.naturalWidth) {
+          jobs.push(Promise.race([
+            new Promise(resolve => { image.addEventListener('load', resolve, { once: true }); image.addEventListener('error', resolve, { once: true }); }),
+            wait(1400)
+          ]));
+        } else if (image.decode) jobs.push(image.decode().catch(() => {}));
+      }
+      await Promise.all(jobs);
+    };
+
+    // ----- text -----------------------------------------------------------
+    const hideCopyInstantly = scene => {
+      const { copy, extras } = partsOf(scene);
+      extras.forEach(el => { el.style.opacity = '0'; });
+      if (!copy) return;
+      copy.classList.add('stage-snap');
+      copy.classList.remove('stage-leave');
+      copy.classList.add('stage-hide');
+      void copy.offsetWidth;
+      copy.classList.remove('stage-snap');
+    };
+
+    const leaveCopy = (scene, dir) => {
+      const { copy, extras } = partsOf(scene);
+      extras.forEach(el => {
+        track(scene._anims, el.animate(
+          [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: `translateY(${-18 * dir}px)` }],
+          { duration: 420, easing: 'ease', fill: 'both' }
+        ));
+      });
+      if (!copy) return;
+      copy.style.setProperty('--stage-y', `${-18 * dir}px`);
+      copy.classList.add('stage-leave');
+    };
+
+    const revealCopy = scene => {
+      const { copy, items, extras } = partsOf(scene);
+      if (copy) {
+        copy.classList.remove('stage-hide', 'stage-leave');
+      }
+      items.forEach((el, i) => {
+        const a = track(scene._anims, el.animate(
+          [{ opacity: 0, transform: 'translateY(22px)' }, { opacity: 1, transform: 'translateY(0)' }],
+          { duration: T.child, delay: i * T.stagger, easing: EASE_OUT, fill: 'both' }
+        ));
+        a.onfinish = () => { try { a.cancel(); } catch (e) {} };
+        if (extras.includes(el)) el.style.opacity = '';
+      });
+    };
+
+    // ----- photographs -------------------------------------------------------
+    const photoEnter = (scene, dir) => {
+      const { image } = partsOf(scene);
+      if (!image || getComputedStyle(image).objectFit === 'contain') return;
+      const index = scenes.indexOf(scene);
+      const from = isMobile ? 1.1 : 1.14;
+      const to = isMobile ? 1 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
+      const shift = dir * ((from - 1) / 2) * 85;
+      track(scene._anims, image.animate(
+        [{ scale: from, translate: `0 ${shift}%` }, { scale: to, translate: '0 0%' }],
+        { duration: T.drift, easing: EASE_OUT, fill: 'both' }
+      ));
+    };
+
+    // ----- the transition ----------------------------------------------------
+    transitionTo = async (target, dir) => {
+      busy = true;
+      window.clearTimeout(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+      const from = scenes[activeIndex];
+      const to = scenes[target];
+      partsOf(from); partsOf(to);
+
+      await ready(to);
+
+      from.style.zIndex = '1';
+      to.style.zIndex = '2';
+      to.style.visibility = 'visible';
+      if (isMobile) to.classList.add('show-copy');
+      setActive(target, false);
+
+      // 1. the outgoing text lifts away
+      leaveCopy(from, dir);
+
+      // 2. the next photograph opens over it
+      const wipeFrames = dir > 0
+        ? [{ clipPath: 'inset(100% 0% 0% 0% round 34px 34px 0px 0px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px 0px 0px 0px)' }]
+        : [{ clipPath: 'inset(0% 0% 100% 0% round 0px 0px 34px 34px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px 0px 0px 0px)' }];
+      const timing = { duration: T.wipe, delay: T.wipeDelay, easing: EASE_WIPE, fill: 'both' };
+      track(to._temp, to.animate(wipeFrames, timing));
+      track(from._temp, from.animate([{ translate: '0 0%' }, { translate: `0 ${-6 * dir}%` }], timing));
+      const veil = document.createElement('div');
+      veil.className = 'stage-veil';
+      from.append(veil);
+      track(from._temp, veil.animate([{ opacity: 0 }, { opacity: 0.62 }], timing));
+      photoEnter(to, dir);
+
+      // 3. the new text arrives once the photograph has landed
+      await wait(T.copyAt);
+      revealCopy(to);
+      await wait(Math.max(0, T.wipe + T.wipeDelay - T.copyAt) + 40);
+
+      // 4. tidy up
+      cancelList(from._temp);
+      cancelList(to._temp);
+      veil.remove();
+      cancelList(from._anims);
+      from.style.zIndex = '';
+      to.style.zIndex = '';
+      from.classList.remove('show-copy');
+      hideCopyInstantly(from);
+      refreshVisibility();
+      lockUntil = performance.now() + T.cooldown;
+      await wait(T.cooldown);
+      busy = false;
+      scheduleAutoAdvance();
+    };
+
+    // ----- first view --------------------------------------------------------
+    root.classList.add('stage');
+    if (!isMobile) {
+      scenes.forEach(scene => {
+        const { image } = partsOf(scene);
+        if (!image) return;
+        image.style.transform = 'translateY(-1%) scale(1.015)';
+        image.style.filter = 'saturate(1) brightness(.96)';
+      });
+    }
+    scenes.forEach(scene => { partsOf(scene); hideCopyInstantly(scene); });
+    if (isMobile) scenes[0].classList.add('show-copy');
+    setActive(0, false);
+    refreshVisibility();
+    busy = true;
+    (async () => {
+      await ready(scenes[0]);
+      track(scenes[0]._temp, scenes[0].animate([{ opacity: 0 }, { opacity: 1 }], { duration: 900, easing: 'ease-out' }));
+      photoEnter(scenes[0], 0);
+      await wait(480);
+      revealCopy(scenes[0]);
+      busy = false;
+      scheduleAutoAdvance();
+    })();
+
+    // ----- input: wheel, touch, keys ------------------------------------------
+    const scrollerOf = (el, dir) => {
+      for (let node = el instanceof Element ? el : null; node && node !== story; node = node.parentElement) {
+        const overflowY = getComputedStyle(node).overflowY;
+        if ((overflowY === 'auto' || overflowY === 'scroll') && node.scrollHeight > node.clientHeight + 2) {
+          if (dir === 0) return node;
+          if (dir > 0 ? node.scrollTop + node.clientHeight < node.scrollHeight - 2 : node.scrollTop > 2) return node;
+        }
+      }
+      return null;
+    };
+
+    let lastWheel = 0;
+    let lastWheelSize = 0;
+    document.addEventListener('wheel', event => {
+      if (event.ctrlKey || event.metaKey) return;
+      const dir = event.deltaY > 0 ? 1 : -1;
+      if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+      if (scrollerOf(event.target, dir)) return;
+      event.preventDefault();
+      const now = performance.now();
+      const size = Math.abs(event.deltaY) * (event.deltaMode === 1 ? 16 : 1);
+      const gap = now - lastWheel;
+      const freshGesture = gap > 90 || size > lastWheelSize + 6;
+      lastWheel = now;
+      lastWheelSize = size;
+      if (busy || now < lockUntil || !freshGesture || size < 8) return;
+      goToScene(activeIndex + dir);
+    }, { passive: false });
+
+    let touch = null;
+    document.addEventListener('touchstart', event => {
+      if (event.touches.length !== 1) { touch = null; return; }
+      const point = event.touches[0];
+      const scroller = scrollerOf(event.target, 0);
+      touch = { x: point.clientX, y: point.clientY, target: event.target, scroller, top: scroller ? scroller.scrollTop : 0 };
+    }, { passive: true });
+    document.addEventListener('touchmove', event => {
+      if (!touch || event.touches.length !== 1) return;
+      const point = event.touches[0];
+      const dy = touch.y - point.clientY;
+      const dx = touch.x - point.clientX;
+      if (Math.abs(dy) > Math.abs(dx) && !scrollerOf(touch.target, dy > 0 ? 1 : -1) && event.cancelable) event.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchend', event => {
+      if (!touch || !event.changedTouches.length) { touch = null; return; }
+      const point = event.changedTouches[0];
+      const dy = touch.y - point.clientY;
+      const dx = touch.x - point.clientX;
+      const moved = touch.scroller && Math.abs(touch.scroller.scrollTop - touch.top) > 2;
+      const start = touch;
+      touch = null;
+      if (moved || busy || performance.now() < lockUntil) return;
+      if (Math.abs(dy) < 48 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
+      if (scrollerOf(start.target, dy > 0 ? 1 : -1)) return;
+      goToScene(activeIndex + (dy > 0 ? 1 : -1));
+    }, { passive: true });
+    document.addEventListener('touchcancel', () => { touch = null; }, { passive: true });
   } else {
     // Graceful fallback for older browsers and visitors requesting reduced motion.
     const observer = new IntersectionObserver(entries => {
@@ -168,25 +364,33 @@
     }, { threshold: [.45, .65] });
     scenes.forEach(scene => observer.observe(scene));
     scenes.forEach(scene => scene.classList.add('motion-fallback'));
+    setActive(0);
   }
 
   prevButton?.addEventListener('click', () => goToScene(activeIndex - 1));
   nextButton?.addEventListener('click', () => goToScene(activeIndex + 1));
   document.addEventListener('keydown', event => {
     const tag = event.target?.tagName?.toLowerCase();
-    if (['input', 'textarea', 'select', 'button', 'a'].includes(tag)) return;
-    if (['ArrowDown', 'PageDown'].includes(event.key)) { event.preventDefault(); goToScene(activeIndex + 1); }
-    if (['ArrowUp', 'PageUp'].includes(event.key)) { event.preventDefault(); goToScene(activeIndex - 1); }
+    if (['input', 'textarea', 'select'].includes(tag) || event.altKey || event.ctrlKey || event.metaKey) return;
+    const interactive = ['button', 'a'].includes(tag);
+    const key = event.key;
+    let target = null;
+    if (key === 'ArrowDown' || key === 'PageDown' || (key === ' ' && !interactive && !event.shiftKey)) target = activeIndex + 1;
+    else if (key === 'ArrowUp' || key === 'PageUp' || (key === ' ' && !interactive && event.shiftKey)) target = activeIndex - 1;
+    else if (key === 'Home' && stage) target = 0;
+    else if (key === 'End' && stage) target = scenes.length - 1;
+    if (target === null) return;
+    event.preventDefault();
+    goToScene(target);
   });
   document.getElementById('backToTop')?.addEventListener('click', () => goToScene(0));
-  setActive(0);
 
   // Lightweight canvas motion graphics: drifting champagne particles and
   // fine orbit lines. The canvas responds to scroll without blocking touch.
   const canvas = document.getElementById('motionCanvas');
   if (canvas && !reducedMotion && !isMobile) {
     const ctx = canvas.getContext('2d');
-    let width = 0, height = 0, frame = 0, scrollRatio = 0;
+    let width = 0, height = 0, frame = 0, drawScroll = 0;
     const particles = Array.from({ length: 42 }, (_, i) => ({
       x: Math.random(), y: Math.random(), r: Math.random() * 1.5 + .35,
       speed: Math.random() * .00022 + .00006, phase: Math.random() * Math.PI * 2,
@@ -196,11 +400,12 @@
     resize(); window.addEventListener('resize', resize, { passive: true });
     window.addEventListener('scroll', () => { scrollRatio = window.scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight); }, { passive: true });
     const draw = () => {
+      drawScroll += (scrollRatio - drawScroll) * .04;
       ctx.clearRect(0, 0, width, height);
       particles.forEach((p, i) => {
         const drift = Math.sin(frame * .006 + p.phase) * 13;
         const x = p.x * width + drift;
-        const y = ((p.y * height - frame * p.speed * height * 2 + scrollRatio * 34) % height + height) % height;
+        const y = ((p.y * height - frame * p.speed * height * 2 + drawScroll * 34) % height + height) % height;
         ctx.beginPath(); ctx.arc(x, y, p.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(236,211,161,${p.alpha})`; ctx.fill();
         if (i % 7 === 0) {
