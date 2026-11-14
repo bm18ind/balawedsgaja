@@ -215,7 +215,7 @@
       const { image } = partsOf(scene);
       if (!image || getComputedStyle(image).objectFit === 'contain') return;
       const index = scenes.indexOf(scene);
-      const from = isMobile ? 1 : 1.14;
+      const from = 1;
       const to = isMobile ? 1 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
       const shift = isMobile ? 0 : dir * ((from - 1) / 2) * 85;
       track(scene._anims, image.animate(
@@ -247,22 +247,14 @@
       // 2. the next photograph opens over it
       const timing = { duration: T.wipe, delay: T.wipeDelay, easing: EASE_WIPE, fill: 'both' };
       let veil = null;
-      if (isMobile) {
-        // Phone: keep the complete image frame visible. Use a soft dissolve
-        // instead of clip-path cropping or a zoom that cuts off the edges.
-        track(to._temp, to.animate([{ opacity: 0.15 }, { opacity: 1 }], timing));
-        track(from._temp, from.animate([{ opacity: 1 }, { opacity: 0 }], timing));
-      } else {
-        const wipeFrames = dir > 0
-          ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
-          : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
-        track(to._temp, to.animate(wipeFrames, timing));
-        track(from._temp, from.animate([{ translate: '0 0%' }, { translate: `0 ${-6 * dir}%` }], timing));
-        veil = document.createElement('div');
-        veil.className = 'stage-veil';
-        from.append(veil);
-        track(from._temp, veil.animate([{ opacity: 0 }, { opacity: 0.62 }], timing));
-      }
+      // Both desktop and mobile use a clean directional wipe. Keep the
+      // outgoing image stationary and fully framed: no translate, zoom,
+      // inset mask, or extra dark veil that makes the old page look cropped.
+      const wipeFrames = dir > 0
+        ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
+        : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
+      track(to._temp, to.animate(wipeFrames, timing));
+      track(from._temp, from.animate([{ opacity: 1 }, { opacity: 1 }], timing));
       photoEnter(to, dir);
 
       // 3. the new text arrives once the photograph has landed
@@ -333,65 +325,64 @@
       return null;
     };
 
-    // Treat the complete wheel/trackpad momentum burst as ONE gesture.
-    // Older logic could interpret later momentum ticks as a second swipe.
+    // One vertical wheel gesture advances exactly one chapter.
+    // Capture phase makes this reliable even when an overlay or child control
+    // stops bubbling. The idle timer groups trackpad momentum into one gesture.
     let wheelGestureLocked = false;
     let wheelResetTimer = null;
     document.addEventListener('wheel', event => {
       if (event.ctrlKey || event.metaKey) return;
-      const dir = event.deltaY > 0 ? 1 : -1;
-      if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
-      if (scrollerOf(event.target, dir)) return;
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX) || Math.abs(event.deltaY) < 10) return;
       event.preventDefault();
 
-      // Restart the idle timer on every wheel tick, including momentum.
       window.clearTimeout(wheelResetTimer);
       wheelResetTimer = window.setTimeout(() => {
         wheelGestureLocked = false;
-      }, 650);
+      }, 520);
 
-      const size = Math.abs(event.deltaY) * (event.deltaMode === 1 ? 16 : 1);
-      if (wheelGestureLocked || size < 8) return;
-
+      if (wheelGestureLocked) return;
       wheelGestureLocked = true;
-      goToScene(activeIndex + dir);
-    }, { passive: false });
+      goToScene(activeIndex + (event.deltaY > 0 ? 1 : -1));
+    }, { passive: false, capture: true });
 
+    // A vertical finger swipe advances one chapter. Do not delegate vertical
+    // swipes to nested text panels: that was making page navigation feel frozen.
     let touch = null;
     let touchNavigationLocked = false;
     let touchResetTimer = null;
     document.addEventListener('touchstart', event => {
       if (event.touches.length !== 1) { touch = null; return; }
       const point = event.touches[0];
-      const scroller = scrollerOf(event.target, 0);
-      touch = { x: point.clientX, y: point.clientY, target: event.target, scroller, top: scroller ? scroller.scrollTop : 0 };
-    }, { passive: true });
+      touch = { x: point.clientX, y: point.clientY };
+    }, { passive: true, capture: true });
+
     document.addEventListener('touchmove', event => {
       if (!touch || event.touches.length !== 1) return;
       const point = event.touches[0];
       const dy = touch.y - point.clientY;
       const dx = touch.x - point.clientX;
-      if (Math.abs(dy) > Math.abs(dx) && !scrollerOf(touch.target, dy > 0 ? 1 : -1) && event.cancelable) event.preventDefault();
-    }, { passive: false });
+      if (Math.abs(dy) > Math.abs(dx) && event.cancelable) event.preventDefault();
+    }, { passive: false, capture: true });
+
     document.addEventListener('touchend', event => {
       if (!touch || !event.changedTouches.length) { touch = null; return; }
       const point = event.changedTouches[0];
       const dy = touch.y - point.clientY;
       const dx = touch.x - point.clientX;
-      const moved = touch.scroller && Math.abs(touch.scroller.scrollTop - touch.top) > 2;
-      const start = touch;
       touch = null;
-      if (moved || touchNavigationLocked) return;
-      if (Math.abs(dy) < 48 || Math.abs(dy) < Math.abs(dx) * 1.3) return;
-      if (scrollerOf(start.target, dy > 0 ? 1 : -1)) return;
+
+      if (touchNavigationLocked) return;
+      if (Math.abs(dy) < 38 || Math.abs(dy) < Math.abs(dx) * 1.2) return;
+
       touchNavigationLocked = true;
       window.clearTimeout(touchResetTimer);
       touchResetTimer = window.setTimeout(() => {
         touchNavigationLocked = false;
-      }, 650);
+      }, 520);
       goToScene(activeIndex + (dy > 0 ? 1 : -1));
-    }, { passive: true });
-    document.addEventListener('touchcancel', () => { touch = null; }, { passive: true });
+    }, { passive: true, capture: true });
+
+    document.addEventListener('touchcancel', () => { touch = null; }, { passive: true, capture: true });
   } else {
     // Graceful fallback for older browsers and visitors requesting reduced motion.
     const observer = new IntersectionObserver(entries => {

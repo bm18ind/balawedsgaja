@@ -1445,3 +1445,28 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     line-height: 1.24 !important;
   }
 }
+
+
+/* Final Page 7 mobile refinement: wider glass panel and larger, balanced story text. */
+@media (max-width: 700px) {
+  #scene-7 .scene-copy {
+    left: 50% !important;
+    right: auto !important;
+    width: 94vw !important;
+    max-width: 94vw !important;
+    padding: 19px 21px !important;
+    text-align: center !important;
+    transform: translate(-50%, 18px) !important;
+  }
+  #scene-7.show-copy .scene-copy {
+    transform: translate(-50%, 0) !important;
+  }
+  #scene-7 .scene-copy h2 {
+    font-size: clamp(23px, 6.5vw, 32px) !important;
+    line-height: 1.22 !important;
+    letter-spacing: -0.025em !important;
+    text-wrap: pretty;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+  }
+}
