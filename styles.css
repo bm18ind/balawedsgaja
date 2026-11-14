@@ -1227,14 +1227,9 @@ body{overflow-x:hidden;background:#11110f}
 }
 
 
-/* Mobile refinements: reveal more of the bride on Page 3 and enable
-   the image morph transition on touch devices without blur. */
+/* Mobile morph transition styles */
 @media (max-width: 700px), (pointer: coarse) {
-  #scene-3 .scene-image {
-    object-position: 68% center !important;
-  }
-
-  .scene-image {
+.scene-image {
     clip-path: inset(8% 5% 8% 5% round 26px) !important;
     transform: scale(1.12) !important;
     transition:
@@ -1296,21 +1291,31 @@ body{overflow-x:hidden;background:#11110f}
 }
 
 
-/* Page 3 mobile focal-point correction: move the photo crop right to keep
-   the bride visible. Use a higher-specificity rule than earlier experiments. */
-@media screen and (max-width: 700px) {
-  #scene-3 > img.scene-image {
-    object-fit: cover !important;
-    object-position: 88% 50% !important;
-  }
-}
-
-
 /* Mobile-only swipe affordance for the Bride and Groom photo carousels. */
 @media screen and (max-width: 700px) {
   [data-carousel] .profile-slides {
     touch-action: pan-y;
     -webkit-user-select: none;
     user-select: none;
+  }
+}
+
+
+/* Mobile performance: keep the morph lightweight on touch devices.
+   Images stay sharp; use transform only rather than animating filters/clip-path. */
+@media (max-width: 700px), (pointer: coarse) {
+  .scene-image {
+    clip-path: none !important;
+    transition: transform .55s ease-out !important;
+    will-change: auto !important;
+    filter: none !important;
+  }
+  .scene.is-current .scene-image {
+    transform: scale(1.015) !important;
+    filter: none !important;
+  }
+  .scene:not(.is-current) .scene-image {
+    transform: scale(1.04) !important;
+    filter: none !important;
   }
 }
