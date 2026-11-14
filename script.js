@@ -499,30 +499,69 @@
 })();
 
 // Independent automatic carousels for the Bride and Groom story chapters.
+// Each carousel resets to photo 01 whenever its chapter becomes active, and
+// only advances while that chapter is on screen.
 (() => {
  const sets={bride:{path:'assets/bride/',files:['01.webp','02.webp','03.webp','04.webp','05.webp','06.webp','07.webp','08.webp','09.webp','10.webp','11.webp']},groom:{path:'assets/groom/',files:['01.webp','02.webp','03.webp','04.webp','05.webp','06.webp','07.webp','08.webp','09.webp','10.webp','11.webp','12.webp']}};
- document.querySelectorAll('[data-carousel]').forEach(box=>{const key=box.dataset.carousel, data=sets[key];if(!data)return;const slides=box.querySelector('.profile-slides'),dots=box.querySelector('.profile-dots'),counter=box.querySelector('.profile-count');let index=0,timer;
- data.files.forEach((file,i)=>{const slide=document.createElement('div');slide.className='profile-slide'+(!i?' active':'');const img=document.createElement('img');img.src=data.path+file;img.alt=(key==='bride'?'Gajapriya':'Balaji')+' photograph '+(i+1);img.loading=i===0?'eager':'lazy';slide.append(img);slides.append(slide);const dot=document.createElement('i');if(!i)dot.className='active';dots.append(dot)});
- const show=n=>{index=(n+data.files.length)%data.files.length;[...slides.children].forEach((x,i)=>x.classList.toggle('active',i===index));[...dots.children].forEach((x,i)=>x.classList.toggle('active',i===index));counter.textContent=String(index+1).padStart(2,'0')+' / '+String(data.files.length).padStart(2,'0')};const restart=()=>{clearInterval(timer);timer=setInterval(()=>show(index+1),4200)};box.querySelector('[data-prev]').addEventListener('click',()=>{show(index-1);restart()});box.querySelector('[data-next]').addEventListener('click',()=>{show(index+1);restart()});
- // Mobile-only horizontal swipe support. Vertical gestures remain available for page scrolling.
- const swipeArea=box.querySelector('.profile-slides');
- if(window.matchMedia('(max-width: 700px)').matches && swipeArea){
-   let startX=0,startY=0;
-   swipeArea.addEventListener('touchstart',event=>{
-     if(!event.touches || event.touches.length!==1)return;
-     startX=event.touches[0].clientX;
-     startY=event.touches[0].clientY;
-   },{passive:true});
-   swipeArea.addEventListener('touchend',event=>{
-     if(!event.changedTouches || event.changedTouches.length!==1)return;
-     const dx=event.changedTouches[0].clientX-startX;
-     const dy=event.changedTouches[0].clientY-startY;
-     if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.2){
-       show(index+(dx<0?1:-1));
-       restart();
-     }
-   },{passive:true});
- }
- restart();
+ document.querySelectorAll('[data-carousel]').forEach(box=>{
+   const key=box.dataset.carousel, data=sets[key];
+   if(!data)return;
+   const slides=box.querySelector('.profile-slides'),dots=box.querySelector('.profile-dots'),counter=box.querySelector('.profile-count');
+   const chapter=box.closest('.scene');
+   let index=0,timer=null;
+   data.files.forEach((file,i)=>{
+     const slide=document.createElement('div');
+     slide.className='profile-slide'+(!i?' active':'');
+     const img=document.createElement('img');
+     img.src=data.path+file;
+     img.alt=(key==='bride'?'Gajapriya':'Balaji')+' photograph '+(i+1);
+     img.loading=i===0?'eager':'lazy';
+     slide.append(img);slides.append(slide);
+     const dot=document.createElement('i');
+     if(!i)dot.className='active';
+     dots.append(dot);
+   });
+   const show=n=>{
+     index=(n+data.files.length)%data.files.length;
+     [...slides.children].forEach((x,i)=>x.classList.toggle('active',i===index));
+     [...dots.children].forEach((x,i)=>x.classList.toggle('active',i===index));
+     counter.textContent=String(index+1).padStart(2,'0')+' / '+String(data.files.length).padStart(2,'0');
+   };
+   const stop=()=>{if(timer!==null){clearInterval(timer);timer=null;}};
+   const start=()=>{
+     stop();
+     timer=setInterval(()=>show(index+1),4200);
+   };
+   const enterChapter=()=>{show(0);start();};
+   box.querySelector('[data-prev]').addEventListener('click',()=>{show(index-1);if(chapter?.classList.contains('is-current'))start();});
+   box.querySelector('[data-next]').addEventListener('click',()=>{show(index+1);if(chapter?.classList.contains('is-current'))start();});
+   // Mobile-only horizontal swipe support. Vertical gestures remain available for page navigation.
+   const swipeArea=box.querySelector('.profile-slides');
+   if(window.matchMedia('(max-width: 700px)').matches && swipeArea){
+     let startX=0,startY=0;
+     swipeArea.addEventListener('touchstart',event=>{
+       if(!event.touches || event.touches.length!==1)return;
+       startX=event.touches[0].clientX;startY=event.touches[0].clientY;
+     },{passive:true});
+     swipeArea.addEventListener('touchend',event=>{
+       if(!event.changedTouches || event.changedTouches.length!==1)return;
+       const dx=event.changedTouches[0].clientX-startX;
+       const dy=event.changedTouches[0].clientY-startY;
+       if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.2){
+         show(index+(dx<0?1:-1));
+         if(chapter?.classList.contains('is-current'))start();
+       }
+     },{passive:true});
+   }
+   if(chapter){
+     const observer=new MutationObserver(()=>{
+       if(chapter.classList.contains('is-current'))enterChapter();
+       else stop();
+     });
+     observer.observe(chapter,{attributes:true,attributeFilter:['class']});
+     if(chapter.classList.contains('is-current'))enterChapter();
+   } else {
+     start();
+   }
  });
 })();
