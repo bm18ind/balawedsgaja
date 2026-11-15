@@ -25,9 +25,9 @@
 
   // Tuning: durations are in milliseconds.
   const T = {
-    wipe: isMobile ? 1050 : 950,        // photograph reveal
+    wipe: 950,                         // same photograph reveal timing on desktop and mobile
     wipeDelay: 140,                    // outgoing text leaves first
-    copyAt: isMobile ? 1240 : 520,      // mobile copy waits until the full photograph wipe has completed
+    copyAt: 520,                       // same image-to-copy handoff timing on desktop and mobile
     stagger: 85,                       // gap between lines of text
     child: 700,                        // each line's fade and rise
     cooldown: 100,                     // brief settle before the next queued change
