@@ -1,23 +1,11 @@
 (() => {
   const scenes = [...document.querySelectorAll('[data-scene]')];
-  if (chapterDots) {
-    chapterDots.innerHTML = scenes.map((scene, index) =>
-      `<button class="story-progress__dot" type="button" data-chapter="${index}" aria-label="Go to chapter ${index + 1}" title="Chapter ${index + 1}"></button>`
-    ).join('');
-    chapterDots.addEventListener('click', event => {
-      const button = event.target.closest('[data-chapter]');
-      if (!button) return;
-      goToScene(Number(button.dataset.chapter));
-    });
-  }
-
   const story = document.getElementById('story');
   const root = document.documentElement;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
   const prevButton = document.getElementById('prevScene');
   const nextButton = document.getElementById('nextScene');
-  const chapterDots = document.getElementById('chapterDots');
   let activeIndex = 0;
   let scrollRatio = 0;
 
@@ -110,13 +98,6 @@
     const nextIndex = clamp(index);
     const changed = nextIndex !== activeIndex;
     activeIndex = nextIndex;
-    if (chapterDots) {
-      chapterDots.querySelectorAll('.story-progress__dot').forEach((dot, index) => {
-        const active = index === activeIndex;
-        dot.classList.toggle('is-active', active);
-        dot.setAttribute('aria-current', active ? 'step' : 'false');
-      });
-    }
     scenes.forEach((scene, i) => {
       scene.classList.toggle('is-current', i === activeIndex);
       if (isMobile && !stage) scene.classList.toggle('show-copy', i === activeIndex);
@@ -418,6 +399,18 @@
     scenes.forEach(scene => scene.classList.add('motion-fallback'));
     setActive(0);
   }
+
+
+  // The original left-side progress meter is also a chapter jump control.
+  // Clicking anywhere along its vertical track jumps to the matching chapter.
+  const storyProgress = document.getElementById('storyProgress');
+  storyProgress?.addEventListener('click', event => {
+    const track = storyProgress.querySelector('.story-progress__track');
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
+    goToScene(Math.round(ratio * (scenes.length - 1)));
+  });
 
   prevButton?.addEventListener('click', () => goToScene(activeIndex - 1));
   nextButton?.addEventListener('click', () => goToScene(activeIndex + 1));

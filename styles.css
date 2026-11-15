@@ -1563,145 +1563,233 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
 }
 
 
-/* Guestbook visual alignment: match the bride/groom carousel chapters. */
-#scene-15 {
-  background:
-    radial-gradient(ellipse at 18% 16%, rgba(111,91,59,.26), transparent 42%),
-    radial-gradient(ellipse at 88% 82%, rgba(93,77,52,.20), transparent 40%),
-    linear-gradient(135deg, #211f1a 0%, #151512 55%, #242119 100%) !important;
-  color: #f5f0e7 !important;
-}
-#scene-15::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  background:linear-gradient(115deg,rgba(0,0,0,.10),transparent 48%,rgba(0,0,0,.16));
-}
-#scene-15 .guestbook-panel {
-  color:#f5f0e7 !important;
-}
-#scene-15 .guestbook-main-title {
-  color:#f5f0e7 !important;
-  text-shadow:0 8px 32px rgba(0,0,0,.25);
-}
-#scene-15 .guestbook-card {
-  background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045)) !important;
-  border:1px solid rgba(255,255,255,.22) !important;
-  box-shadow:0 24px 70px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.10) !important;
-  backdrop-filter:blur(18px) saturate(125%);
-  -webkit-backdrop-filter:blur(18px) saturate(125%);
-  color:#f5f0e7 !important;
-}
-#scene-15 .guestbook-card h2 { color:#f5f0e7 !important; }
-#scene-15 .guestbook-card h3 { color:rgba(245,240,231,.70) !important; }
-#scene-15 .wish-card {
-  background:rgba(12,12,10,.30) !important;
-  border:1px solid rgba(255,255,255,.18) !important;
-}
-#scene-15 .wish-card p { color:#f5f0e7 !important; }
-#scene-15 .wish-card strong { color:#e3c58f !important; }
-#scene-15 .wish-footer, #scene-15 .wish-footer small { color:rgba(245,240,231,.64) !important; }
-#scene-15 .wish-controls { color:#f5f0e7 !important; }
-#scene-15 .wish-controls button {
-  background:rgba(255,255,255,.08) !important;
-  border-color:rgba(255,255,255,.32) !important;
-  color:#f5f0e7 !important;
-}
-#scene-15 .guestbook-form label { color:#e3c58f !important; }
-#scene-15 .guestbook-form input, #scene-15 .guestbook-form textarea {
-  background:rgba(255,255,255,.94) !important;
-  color:#29251d !important;
-}
-#scene-15 .guestbook-submit {
-  background:#e3c58f !important;
-  color:#211e18 !important;
-  border-color:#e3c58f !important;
-}
-#scene-15 .guestbook-status { color:rgba(245,240,231,.72) !important; }
-#scene-15 .guestbook-status.is-error { color:#ffaaa0 !important; }
-#scene-15 .guestbook-status.is-success { color:#a9d6ad !important; }
-
-/* Clickable chapter rail on the left; works with the existing scene transitions. */
+/* RESTORE / PRESERVE ORIGINAL CINEMATIC NAVIGATION */
 .story-progress {
-  width:24px;
-  left:22px;
-  gap:12px;
-  pointer-events:auto;
-  writing-mode:initial;
-  flex-direction:column;
+  cursor: pointer;
+  pointer-events: auto !important;
+  touch-action: manipulation;
 }
 .story-progress__track {
-  position:absolute;
-  left:11px;
-  top:0;
-  height:100%;
-  width:1px;
+  width: 14px !important;
+  margin-left: -6px;
+  padding: 0 6px;
+  box-sizing: content-box;
+  background-clip: content-box;
+}
+.story-progress__track:hover {
+  background-color: rgba(255,255,255,.42);
 }
 .story-progress__fill {
-  left:0; top:0; width:100%;
-}
-.story-progress__dots {
-  position:relative;
-  z-index:2;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  height:clamp(190px,42vh,420px);
-  width:24px;
-}
-.story-progress__dot {
-  appearance:none;
-  border:0;
-  padding:0;
-  margin:0;
-  width:8px;
-  height:8px;
-  min-width:8px;
-  border-radius:50%;
-  background:rgba(255,255,255,.42);
-  box-shadow:0 0 0 3px rgba(20,20,18,.34);
-  cursor:pointer;
-  transition:transform .2s ease,background .2s ease,box-shadow .2s ease;
-}
-.story-progress__dot:hover { transform:scale(1.45); background:#e3c58f; }
-.story-progress__dot.is-active {
-  background:#e3c58f;
-  transform:scale(1.45);
-  box-shadow:0 0 0 4px rgba(227,197,143,.20);
-}
-.story-progress__dot:focus-visible {
-  outline:2px solid #e3c58f;
-  outline-offset:4px;
+  pointer-events: none;
 }
 .story-progress__count {
-  transform:none;
-  writing-mode:vertical-rl;
-  color:rgba(255,255,255,.78);
+  pointer-events: none;
 }
-@media(max-width:700px) {
-  .story-progress { left:7px; gap:8px; width:18px; }
-  .story-progress__dots { height:clamp(170px,36vh,310px); width:18px; }
-  .story-progress__track { left:8px; }
-  .story-progress__dot { width:6px; height:6px; min-width:6px; }
-  .story-progress__count { font-size:7px; }
+.story-progress:focus-visible {
+  outline: 1px solid rgba(232,211,164,.75);
+  outline-offset: 7px;
+  border-radius: 8px;
 }
 
-/* Closing chapter: keep the message precisely centred on phone screens. */
-@media(max-width:700px) {
-  #scene-16 .closing-copy {
-    position:absolute !important;
-    left:50% !important;
-    right:auto !important;
-    top:50% !important;
-    bottom:auto !important;
-    width:calc(100% - 44px) !important;
-    max-width:calc(100% - 44px) !important;
-    margin:0 !important;
-    transform:translate(-50%,-50%) !important;
-    text-align:center !important;
+/* Once the visitor interacts, remove the guidance cue completely.
+   It must not remain as a faint, permanently visible overlay. */
+.scroll-cue.is-hidden {
+  display: none !important;
+}
+
+/* GUESTBOOK: keep its dark cinematic atmosphere without changing the
+   surrounding chapters, their photographs, transitions, or carousel layout. */
+#scene-15 {
+  background:
+    radial-gradient(ellipse at 18% 15%, rgba(112,91,58,.24), transparent 43%),
+    radial-gradient(ellipse at 84% 85%, rgba(88,72,48,.20), transparent 42%),
+    linear-gradient(135deg, #211f1b 0%, #171613 55%, #242119 100%) !important;
+  overflow: hidden !important;
+}
+#scene-15::after { display: none !important; }
+#scene-15 .guestbook-panel {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, calc(-50% + 22px)) !important;
+  width: min(1120px, 92vw) !important;
+  max-width: 1120px !important;
+  max-height: none !important;
+  overflow: visible !important;
+  overscroll-behavior: auto !important;
+  margin: 0 !important;
+  padding: clamp(18px, 2.6vw, 32px) !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #f5f0e7 !important;
+  text-align: left;
+  pointer-events: auto !important;
+}
+#scene-15.show-copy .guestbook-panel {
+  transform: translate(-50%, -50%) !important;
+}
+#scene-15 .guestbook-main-title {
+  color: #f5f0e7 !important;
+  text-shadow: 0 8px 32px rgba(0,0,0,.25);
+}
+#scene-15 .guestbook-card {
+  background: linear-gradient(145deg, rgba(255,255,255,.105), rgba(255,255,255,.045)) !important;
+  border: 1px solid rgba(255,255,255,.22) !important;
+  box-shadow: 0 24px 70px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.10) !important;
+  backdrop-filter: blur(18px) saturate(125%);
+  -webkit-backdrop-filter: blur(18px) saturate(125%);
+  color: #f5f0e7 !important;
+}
+#scene-15 .guestbook-card h2 { color: #f5f0e7 !important; }
+#scene-15 .guestbook-card h3 { color: rgba(245,240,231,.72) !important; }
+#scene-15 .wish-card {
+  background: rgba(12,12,10,.30) !important;
+  border: 1px solid rgba(255,255,255,.18) !important;
+}
+#scene-15 .wish-card p { color: #f5f0e7 !important; }
+#scene-15 .wish-card strong { color: #e3c58f !important; }
+#scene-15 .wish-footer,
+#scene-15 .wish-footer small { color: rgba(245,240,231,.68) !important; }
+#scene-15 .wish-controls { color: #f5f0e7 !important; }
+#scene-15 .wish-controls button {
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.32) !important;
+  color: #f5f0e7 !important;
+}
+#scene-15 .guestbook-form label { color: #e3c58f !important; }
+#scene-15 .guestbook-form input,
+#scene-15 .guestbook-form textarea {
+  background: rgba(255,255,255,.96) !important;
+  color: #29251d !important;
+}
+#scene-15 .guestbook-submit {
+  background: #e3c58f !important;
+  color: #211e18 !important;
+  border-color: #e3c58f !important;
+}
+#scene-15 .guestbook-status { color: rgba(245,240,231,.78) !important; }
+#scene-15 .guestbook-status.is-error { color: #ffaaa0 !important; }
+#scene-15 .guestbook-status.is-success { color: #a9d6ad !important; }
+
+/* Important: the guestbook panel itself is not an inner scroll container.
+   A wheel/touch gesture on it should advance to the next chapter like the rest
+   of the experience, rather than requiring the visitor to scroll to its bottom. */
+#scene-15 .guestbook-panel,
+#scene-15 .guestbook-layout,
+#scene-15 .guestbook-card {
+  overscroll-behavior: auto !important;
+}
+@media (min-width: 701px) {
+  #scene-15 .guestbook-layout {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr) !important;
+    align-items: stretch;
   }
-  #scene-16 .closing-copy h2,
-  #scene-16 .closing-copy .eyebrow { text-align:center !important; }
+  #scene-15 .guestbook-card:first-child { min-height: 390px; }
+  #scene-15 .guestbook-card:last-child { min-height: 390px; }
+}
+
+/* Mobile: compact the whole guestbook chapter so it fits the viewport,
+   keep rounded glass cards, and give the wishes display more visual weight. */
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-15 .guestbook-panel {
+    top: 50% !important;
+    width: 94vw !important;
+    max-width: 94vw !important;
+    max-height: none !important;
+    padding: 10px 8px !important;
+    overflow: visible !important;
+    transform: translate(-50%, calc(-50% + 14px)) !important;
+  }
+  #scene-15.show-copy .guestbook-panel {
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-15 .guestbook-main-title {
+    font-size: clamp(30px, 7.5vw, 39px) !important;
+    line-height: 1.02 !important;
+    margin: 0 0 10px !important;
+  }
+  #scene-15 .guestbook-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 9px !important;
+  }
+  #scene-15 .guestbook-card {
+    padding: 12px 14px !important;
+    border-radius: 18px !important;
+  }
+  #scene-15 .guestbook-card:first-child {
+    min-height: 0 !important;
+  }
+  #scene-15 .guestbook-card:last-child {
+    min-height: 0 !important;
+  }
+  #scene-15 .guestbook-card h2 {
+    font-size: clamp(21px, 5.5vw, 26px) !important;
+    margin: 0 0 5px !important;
+  }
+  #scene-15 .guestbook-card h3 {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    margin: 0 0 8px !important;
+  }
+  #scene-15 .wish-card {
+    min-height: 94px !important;
+    padding: 12px 14px !important;
+  }
+  #scene-15 .wish-card p {
+    font-size: 16px !important;
+    line-height: 1.35 !important;
+    margin-bottom: 8px !important;
+  }
+  #scene-15 .wish-footer { margin-top: 6px !important; }
+  #scene-15 .guestbook-form { gap: 5px !important; }
+  #scene-15 .guestbook-form label {
+    font-size: 8px !important;
+    margin-top: 2px !important;
+  }
+  #scene-15 .guestbook-form input {
+    min-height: 36px !important;
+    padding: 7px 10px !important;
+    font-size: 16px !important;
+  }
+  #scene-15 .guestbook-form textarea {
+    min-height: 52px !important;
+    padding: 7px 10px !important;
+    font-size: 16px !important;
+  }
+  #scene-15 .turnstile-wrap {
+    min-height: 54px !important;
+    margin-top: 0 !important;
+    transform: scale(.88);
+    transform-origin: left center;
+  }
+  #scene-15 .guestbook-submit {
+    min-height: 36px !important;
+    padding: 8px 15px !important;
+    font-size: 8px !important;
+  }
+  #scene-15 .guestbook-status {
+    min-height: 13px !important;
+    font-size: 10px !important;
+  }
+  #scene-15 .guestbook-divider { margin: 7px 0 5px !important; }
+  #scene-15 .scene-index { color: rgba(255,255,255,.8) !important; }
+}
+
+/* Closing page mobile text stays centred without changing its original photo. */
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-16 .closing-copy {
+    left: 50% !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(90vw, 560px) !important;
+    max-width: 90vw !important;
+    text-align: center !important;
+  }
 }
