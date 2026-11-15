@@ -57,14 +57,12 @@
     renderWish();
     restartRotation();
   };
-  const loadWishes = async ({ initial = false } = {}) => {
+  const loadWishes = async () => {
     if (!client) {
       $('wishCount').textContent = 'Guestbook unavailable';
       $('wishMessage').textContent = 'Please check back soon.';
       return;
     }
-    const previousId = wishes[current]?.id;
-    const previousIndex = current;
     const { data, error } = await client.from('guestbook_wishes')
       .select('id,name,message,created_at').eq('is_visible', true)
       .order('created_at', { ascending: false }).limit(200);
@@ -74,26 +72,8 @@
       $('wishMessage').textContent = 'Please refresh the page in a little while.';
       return;
     }
-
-    const freshRows = data || [];
-    if (initial || !wishes.length) {
-      wishes = shuffle(freshRows);
-      current = 0;
-    } else {
-      // Keep the existing random order stable, update changed messages,
-      // remove hidden/deleted wishes, and append newly visible wishes.
-      const freshById = new Map(freshRows.map(row => [row.id, row]));
-      const retained = wishes
-        .filter(row => freshById.has(row.id))
-        .map(row => freshById.get(row.id));
-      const retainedIds = new Set(retained.map(row => row.id));
-      const added = freshRows.filter(row => !retainedIds.has(row.id));
-      wishes = [...retained, ...shuffle(added)];
-      const sameWishIndex = wishes.findIndex(row => row.id === previousId);
-      current = sameWishIndex >= 0
-        ? sameWishIndex
-        : (wishes.length ? Math.min(previousIndex, wishes.length - 1) : 0);
-    }
+    wishes = shuffle(data || []);
+    current = 0;
     renderWish();
     restartRotation();
   };
@@ -137,29 +117,13 @@
     }
   });
 
-  loadWishes({ initial: true });
+  loadWishes();
   if (client) {
     channel = client.channel('public-guestbook-wishes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'guestbook_wishes' }, () => {
-        // Re-fetch under the public visibility policy so hidden/deleted wishes
-        // disappear and restored wishes return without a page refresh.
-        loadWishes();
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_wishes' }, payload => {
+        if (payload.new?.is_visible) addWish(payload.new);
       })
-      .subscribe(status => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn('Guestbook Realtime unavailable; periodic refresh remains active.');
-        }
-      });
-
-    // Safety net: a row becoming hidden may no longer pass the public SELECT
-    // policy for Realtime delivery. This catches those changes within 8 seconds.
-    const syncTimer = window.setInterval(() => {
-      if (!document.hidden) loadWishes();
-    }, 8000);
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) loadWishes();
-    });
-    window.addEventListener('beforeunload', () => window.clearInterval(syncTimer));
+      .subscribe(status => { if (status === 'CHANNEL_ERROR') console.warn('Guestbook live updates unavailable; refresh to see new wishes.'); });
   }
   window.addEventListener('beforeunload', () => { if (rotateTimer) clearInterval(rotateTimer); if (channel && client) client.removeChannel(channel); });
 })();
