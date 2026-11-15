@@ -6,6 +6,9 @@
   const isMobile = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
   const prevButton = document.getElementById('prevScene');
   const nextButton = document.getElementById('nextScene');
+  // Must be declared before setActive(): stage initialisation calls setActive()
+  // before the numbered navigation markup is populated later in this file.
+  const chapterNumberList = document.getElementById('chapterNumberList');
   let activeIndex = 0;
   let scrollRatio = 0;
 
@@ -411,7 +414,6 @@
 
   // Numbered chapter navigation: each circle jumps directly to its scene.
   const storyProgress = document.getElementById('storyProgress');
-  const chapterNumberList = document.getElementById('chapterNumberList');
   if (chapterNumberList) {
     chapterNumberList.innerHTML = scenes.map((scene, index) =>
       `<button class="chapter-number" type="button" data-chapter-index="${index}" aria-label="Go to page ${index + 1}" title="Page ${index + 1}">${index + 1}</button>`
