@@ -1,11 +1,23 @@
 (() => {
   const scenes = [...document.querySelectorAll('[data-scene]')];
+  if (chapterDots) {
+    chapterDots.innerHTML = scenes.map((scene, index) =>
+      `<button class="story-progress__dot" type="button" data-chapter="${index}" aria-label="Go to chapter ${index + 1}" title="Chapter ${index + 1}"></button>`
+    ).join('');
+    chapterDots.addEventListener('click', event => {
+      const button = event.target.closest('[data-chapter]');
+      if (!button) return;
+      goToScene(Number(button.dataset.chapter));
+    });
+  }
+
   const story = document.getElementById('story');
   const root = document.documentElement;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const isMobile = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
   const prevButton = document.getElementById('prevScene');
   const nextButton = document.getElementById('nextScene');
+  const chapterDots = document.getElementById('chapterDots');
   let activeIndex = 0;
   let scrollRatio = 0;
 
@@ -98,6 +110,13 @@
     const nextIndex = clamp(index);
     const changed = nextIndex !== activeIndex;
     activeIndex = nextIndex;
+    if (chapterDots) {
+      chapterDots.querySelectorAll('.story-progress__dot').forEach((dot, index) => {
+        const active = index === activeIndex;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-current', active ? 'step' : 'false');
+      });
+    }
     scenes.forEach((scene, i) => {
       scene.classList.toggle('is-current', i === activeIndex);
       if (isMobile && !stage) scene.classList.toggle('show-copy', i === activeIndex);

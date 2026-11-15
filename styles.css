@@ -1561,3 +1561,147 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
   #scene-15 .guestbook-form textarea{min-height:82px;}
   #scene-15 .guestbook-form input,#scene-15 .guestbook-form textarea{font-size:16px;}
 }
+
+
+/* Guestbook visual alignment: match the bride/groom carousel chapters. */
+#scene-15 {
+  background:
+    radial-gradient(ellipse at 18% 16%, rgba(111,91,59,.26), transparent 42%),
+    radial-gradient(ellipse at 88% 82%, rgba(93,77,52,.20), transparent 40%),
+    linear-gradient(135deg, #211f1a 0%, #151512 55%, #242119 100%) !important;
+  color: #f5f0e7 !important;
+}
+#scene-15::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(115deg,rgba(0,0,0,.10),transparent 48%,rgba(0,0,0,.16));
+}
+#scene-15 .guestbook-panel {
+  color:#f5f0e7 !important;
+}
+#scene-15 .guestbook-main-title {
+  color:#f5f0e7 !important;
+  text-shadow:0 8px 32px rgba(0,0,0,.25);
+}
+#scene-15 .guestbook-card {
+  background:linear-gradient(145deg,rgba(255,255,255,.105),rgba(255,255,255,.045)) !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  box-shadow:0 24px 70px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.10) !important;
+  backdrop-filter:blur(18px) saturate(125%);
+  -webkit-backdrop-filter:blur(18px) saturate(125%);
+  color:#f5f0e7 !important;
+}
+#scene-15 .guestbook-card h2 { color:#f5f0e7 !important; }
+#scene-15 .guestbook-card h3 { color:rgba(245,240,231,.70) !important; }
+#scene-15 .wish-card {
+  background:rgba(12,12,10,.30) !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+}
+#scene-15 .wish-card p { color:#f5f0e7 !important; }
+#scene-15 .wish-card strong { color:#e3c58f !important; }
+#scene-15 .wish-footer, #scene-15 .wish-footer small { color:rgba(245,240,231,.64) !important; }
+#scene-15 .wish-controls { color:#f5f0e7 !important; }
+#scene-15 .wish-controls button {
+  background:rgba(255,255,255,.08) !important;
+  border-color:rgba(255,255,255,.32) !important;
+  color:#f5f0e7 !important;
+}
+#scene-15 .guestbook-form label { color:#e3c58f !important; }
+#scene-15 .guestbook-form input, #scene-15 .guestbook-form textarea {
+  background:rgba(255,255,255,.94) !important;
+  color:#29251d !important;
+}
+#scene-15 .guestbook-submit {
+  background:#e3c58f !important;
+  color:#211e18 !important;
+  border-color:#e3c58f !important;
+}
+#scene-15 .guestbook-status { color:rgba(245,240,231,.72) !important; }
+#scene-15 .guestbook-status.is-error { color:#ffaaa0 !important; }
+#scene-15 .guestbook-status.is-success { color:#a9d6ad !important; }
+
+/* Clickable chapter rail on the left; works with the existing scene transitions. */
+.story-progress {
+  width:24px;
+  left:22px;
+  gap:12px;
+  pointer-events:auto;
+  writing-mode:initial;
+  flex-direction:column;
+}
+.story-progress__track {
+  position:absolute;
+  left:11px;
+  top:0;
+  height:100%;
+  width:1px;
+}
+.story-progress__fill {
+  left:0; top:0; width:100%;
+}
+.story-progress__dots {
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  height:clamp(190px,42vh,420px);
+  width:24px;
+}
+.story-progress__dot {
+  appearance:none;
+  border:0;
+  padding:0;
+  margin:0;
+  width:8px;
+  height:8px;
+  min-width:8px;
+  border-radius:50%;
+  background:rgba(255,255,255,.42);
+  box-shadow:0 0 0 3px rgba(20,20,18,.34);
+  cursor:pointer;
+  transition:transform .2s ease,background .2s ease,box-shadow .2s ease;
+}
+.story-progress__dot:hover { transform:scale(1.45); background:#e3c58f; }
+.story-progress__dot.is-active {
+  background:#e3c58f;
+  transform:scale(1.45);
+  box-shadow:0 0 0 4px rgba(227,197,143,.20);
+}
+.story-progress__dot:focus-visible {
+  outline:2px solid #e3c58f;
+  outline-offset:4px;
+}
+.story-progress__count {
+  transform:none;
+  writing-mode:vertical-rl;
+  color:rgba(255,255,255,.78);
+}
+@media(max-width:700px) {
+  .story-progress { left:7px; gap:8px; width:18px; }
+  .story-progress__dots { height:clamp(170px,36vh,310px); width:18px; }
+  .story-progress__track { left:8px; }
+  .story-progress__dot { width:6px; height:6px; min-width:6px; }
+  .story-progress__count { font-size:7px; }
+}
+
+/* Closing chapter: keep the message precisely centred on phone screens. */
+@media(max-width:700px) {
+  #scene-16 .closing-copy {
+    position:absolute !important;
+    left:50% !important;
+    right:auto !important;
+    top:50% !important;
+    bottom:auto !important;
+    width:calc(100% - 44px) !important;
+    max-width:calc(100% - 44px) !important;
+    margin:0 !important;
+    transform:translate(-50%,-50%) !important;
+    text-align:center !important;
+  }
+  #scene-16 .closing-copy h2,
+  #scene-16 .closing-copy .eyebrow { text-align:center !important; }
+}

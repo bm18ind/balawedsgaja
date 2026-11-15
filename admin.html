@@ -190,7 +190,7 @@ button:disabled{opacity:.5;cursor:wait;transform:none}
   function csvCell(value) {
     let text = String(value ?? '');
     // Prevent spreadsheet formula injection while preserving normal guest text.
-    if (/^[\\s]*[=+@\\-]/.test(text)) text = "'" + text;
+    if (/^\s*[=+@\-]/.test(text)) text = "'" + text;
     return '"' + text.replace(/"/g, '""') + '"';
   }
 
@@ -208,7 +208,7 @@ button:disabled{opacity:.5;cursor:wait;transform:none}
         row.is_visible ? 'Visible' : 'Hidden'
       ])].map(row => row.map(csvCell).join(','));
       // UTF-8 BOM helps Excel display Tamil and other Unicode text correctly.
-      const csv = '\\uFEFF' + lines.join('\\r\\n');
+      const csv = '\uFEFF' + lines.join('\r\n');
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const objectUrl = globalThis.URL.createObjectURL(blob);
       const anchor = document.createElement('a');
