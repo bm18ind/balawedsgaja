@@ -25,9 +25,9 @@
 
   // Tuning: durations are in milliseconds.
   const T = {
-    wipe: 950,                         // same photograph reveal timing on desktop and mobile
+    wipe: isMobile ? 1050 : 950,        // photograph reveal
     wipeDelay: 140,                    // outgoing text leaves first
-    copyAt: 520,                       // same image-to-copy handoff timing on desktop and mobile
+    copyAt: isMobile ? 560 : 520,       // when the new text begins, measured from the start
     stagger: 85,                       // gap between lines of text
     child: 700,                        // each line's fade and rise
     cooldown: 100,                     // brief settle before the next queued change
@@ -249,8 +249,8 @@
       from.style.zIndex = '1';
       to.style.zIndex = '2';
       to.style.visibility = 'visible';
-      // Keep the incoming copy hidden until its photograph has fully wiped in.
-      // Mobile panels must not appear over a half-revealed image.
+      // Match the uploaded reference: mobile copy begins its reveal with the wipe.
+      if (isMobile) to.classList.add('show-copy');
       setActive(target, false);
 
       // 1. the outgoing text lifts away
@@ -270,7 +270,6 @@
 
       // 3. the new text arrives once the photograph has landed
       await wait(T.copyAt);
-      if (isMobile) to.classList.add('show-copy');
       revealCopy(to);
       await wait(Math.max(0, T.wipe + T.wipeDelay - T.copyAt) + 40);
 
