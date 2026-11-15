@@ -89,27 +89,32 @@
 <img class="scene-image family-image" src="assets/images/12-family.webp" alt="The families celebrating together" loading="lazy"><div class="family-shade"></div>
 <div class="scene-copy family-copy"><p class="eyebrow">WITH LOVE</p><div class="family-columns"><div><p>T. Mathiyalagan<br>M. Pragatheeswari<br>M. Kailash</p><strong>Thirumanur,<br>Ariyalur Dist.</strong></div><div><p>D. Pandiyan<br>P. Arunadevi<br>P. Mathumitha</p><strong>Sathanur,<br>Perambalur Dist.</strong></div></div></div><div class="scene-index">14 <b>/ 16</b></div>
 </section>
-<section class="scene guestbook-scene" id="scene-15" data-scene data-position="center 50%">
-<img class="scene-image" src="assets/images/13-new-journey.webp" alt="Balaji and Gajapriya beginning their journey together" loading="lazy">
+<section class="scene guestbook-scene" id="scene-15" data-scene aria-label="Guestbook">
 <div class="guestbook-panel scene-copy">
-  <p class="eyebrow">A LITTLE LOVE FROM YOU</p>
-  <h2>Leave us a <em>wish.</em></h2>
-  <p class="guestbook-intro">Your words will become a part of our story. Leave us a message to remember this day.</p>
-  <form id="guestbookForm" class="guestbook-form">
-    <label for="guestName">YOUR NAME</label>
-    <input id="guestName" name="name" type="text" maxlength="60" autocomplete="name" placeholder="Your name" required>
-    <label for="guestMessage">YOUR WISH</label>
-    <textarea id="guestMessage" name="message" maxlength="1000" rows="3" placeholder="Write something lovely..." required></textarea>
-    <div class="turnstile-wrap"><div class="cf-turnstile" data-sitekey="0x4AAAAAAGCHNaYH8gfv9R2t" data-theme="light" data-callback="guestbookTurnstileSolved" data-expired-callback="guestbookTurnstileExpired"></div></div>
-    <button class="glass-button guestbook-submit" type="submit" id="guestbookSubmit">SEND YOUR WISH <span>↗</span></button>
-    <p class="guestbook-status" id="guestbookStatus" role="status" aria-live="polite"></p>
-  </form>
-  <div class="guestbook-divider"></div>
-  <div class="wish-heading"><span>WORDS WE'LL KEEP</span><small id="wishCount">Loading wishes…</small></div>
-  <div class="wish-card" aria-live="polite" aria-atomic="true">
-    <p id="wishMessage">Be the first to leave us a wish.</p><strong id="wishName">With love, Balaji & Gajapriya</strong>
+  <h1 class="guestbook-main-title">Send us your wishes!</h1>
+  <div class="guestbook-layout">
+    <section class="guestbook-card guestbook-wishes-card" aria-labelledby="guestbookWishesHeading">
+      <h2 id="guestbookWishesHeading">Words from our loved ones</h2>
+      <h3>Every message here is a little memory we'll carry with us.</h3>
+      <div class="wish-card" aria-live="polite" aria-atomic="true">
+        <p id="wishMessage">Be the first to leave us a wish.</p><strong id="wishName">With love, Balaji &amp; Gajapriya</strong>
+      </div>
+      <div class="wish-footer"><small id="wishCount">Loading wishes…</small><div class="wish-controls"><button type="button" id="wishPrev" aria-label="Previous wish">‹</button><span id="wishPosition">—</span><button type="button" id="wishNext" aria-label="Next wish">›</button></div></div>
+    </section>
+    <section class="guestbook-card guestbook-form-card" aria-labelledby="guestbookFormHeading">
+      <h2 id="guestbookFormHeading">Leave us your message</h2>
+      <h3>We would love to hear your wishes as we begin this new chapter.</h3>
+      <form id="guestbookForm" class="guestbook-form">
+        <label for="guestName">YOUR NAME</label>
+        <input id="guestName" name="name" type="text" maxlength="60" autocomplete="name" placeholder="Enter your name" required>
+        <label for="guestMessage">YOUR WISH</label>
+        <textarea id="guestMessage" name="message" maxlength="1000" rows="4" placeholder="Write your wish" required></textarea>
+        <div class="turnstile-wrap"><div class="cf-turnstile" data-sitekey="0x4AAAAAAGCHNaYH8gfv9R2t" data-theme="light" data-callback="guestbookTurnstileSolved" data-expired-callback="guestbookTurnstileExpired"></div></div>
+        <button class="glass-button guestbook-submit" type="submit" id="guestbookSubmit">Send your wish</button>
+        <p class="guestbook-status" id="guestbookStatus" role="status" aria-live="polite"></p>
+      </form>
+    </section>
   </div>
-  <div class="wish-controls"><button type="button" id="wishPrev" aria-label="Previous wish">‹</button><span id="wishPosition">—</span><button type="button" id="wishNext" aria-label="Next wish">›</button></div>
 </div>
 <div class="scene-index">15 <b>/ 16</b></div>
 </section>

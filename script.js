@@ -333,6 +333,7 @@
     document.addEventListener('wheel', event => {
       if (event.ctrlKey || event.metaKey) return;
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX) || Math.abs(event.deltaY) < 10) return;
+      if (scrollerOf(event.target, event.deltaY > 0 ? 1 : -1)) return;
       event.preventDefault();
 
       window.clearTimeout(wheelResetTimer);
@@ -373,6 +374,7 @@
 
       if (touchNavigationLocked) return;
       if (Math.abs(dy) < 38 || Math.abs(dy) < Math.abs(dx) * 1.2) return;
+      if (scrollerOf(event.target, dy > 0 ? 1 : -1)) return;
 
       touchNavigationLocked = true;
       window.clearTimeout(touchResetTimer);
