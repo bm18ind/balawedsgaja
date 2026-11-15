@@ -5,12 +5,52 @@
 <div id="loginPanel" class="panel login"><p class="eyebrow">BALAJI & GAJAPRIYA · PRIVATE AREA</p><h1>Guestbook Admin</h1><p>Sign in with the admin email and password you created in Supabase Authentication.</p><form id="loginForm"><div class="field"><label for="email">EMAIL</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label for="password">PASSWORD</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginButton">SIGN IN</button><div class="status" id="loginStatus" role="status"></div></form></div>
 <section id="dashboard" class="hidden"><div class="top"><div><p class="eyebrow">BALAJI & GAJAPRIYA · PRIVATE AREA</p><h1>Guestbook wishes</h1><p>Review, hide, restore or permanently delete messages.</p></div><button class="secondary" id="signOut">SIGN OUT</button></div><div class="panel"><div class="toolbar"><div class="stats"><div class="stat"><strong id="totalCount">—</strong><span>TOTAL</span></div><div class="stat"><strong id="visibleCount">—</strong><span>VISIBLE</span></div><div class="stat"><strong id="hiddenCount">—</strong><span>HIDDEN</span></div></div><div class="actions"><button class="secondary" id="refresh">REFRESH</button><button id="export">EXPORT CSV</button></div></div><div class="field"><label for="search">SEARCH WISHES</label><input id="search" type="search" placeholder="Search by name or message"></div><div class="status" id="adminStatus" role="status"></div><div id="wishList"></div></div></section>
 </main><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
-(() => {const URL='https://fcvdcjcfjozcxgvvyxbt.supabase.co',KEY='sb_publishable_OSy9S3VU5pFFVB5AFRsSCA_o3FZz5Us';const db=window.supabase.createClient(URL,KEY);let rows=[];const $=id=>document.getElementById(id);const status=(id,msg)=>$(id).textContent=msg;const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+(() => {const SUPABASE_URL='https://fcvdcjcfjozcxgvvyxbt.supabase.co',KEY='sb_publishable_OSy9S3VU5pFFVB5AFRsSCA_o3FZz5Us';const db=window.supabase.createClient(SUPABASE_URL,KEY);let rows=[];const $=id=>document.getElementById(id);const status=(id,msg)=>$(id).textContent=msg;const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 async function isAdmin(){const {data,error}=await db.from('guestbook_admins').select('user_id').eq('user_id',(await db.auth.getUser()).data.user.id).maybeSingle();if(error||!data)throw new Error('This account is not listed as a guestbook admin.');}
 async function load(){status('adminStatus','Loading wishes…');const {data,error}=await db.from('guestbook_wishes').select('id,name,message,created_at,is_visible').order('created_at',{ascending:false}).limit(1000);if(error){status('adminStatus','Could not load wishes: '+error.message);return;}rows=data||[];$('totalCount').textContent=rows.length;$('visibleCount').textContent=rows.filter(x=>x.is_visible).length;$('hiddenCount').textContent=rows.filter(x=>!x.is_visible).length;render();status('adminStatus','');}
 function render(){const q=$('search').value.trim().toLowerCase();const list=rows.filter(r=>(r.name+' '+r.message).toLowerCase().includes(q));$('wishList').innerHTML=list.length?list.map(r=>`<article class="wish"><div><h3>${esc(r.name)} ${r.is_visible?'':'<span style="color:#d9bd89;font-size:10px">· HIDDEN</span>'}</h3><p>${esc(r.message)}</p><div class="meta">${new Date(r.created_at).toLocaleString()}</div></div><div class="actions"><button class="secondary" data-action="toggle" data-id="${esc(r.id)}">${r.is_visible?'HIDE':'RESTORE'}</button><button class="danger" data-action="delete" data-id="${esc(r.id)}">DELETE</button></div></article>`).join(''):'<p>No wishes match your search.</p>';}
 $('wishList').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const id=b.dataset.id,action=b.dataset.action;b.disabled=true;if(action==='delete'&&!confirm('Permanently delete this wish? This cannot be undone.')){b.disabled=false;return;}let result;if(action==='toggle'){const row=rows.find(x=>x.id===id);result=await db.from('guestbook_wishes').update({is_visible:!row.is_visible}).eq('id',id);}else result=await db.from('guestbook_wishes').delete().eq('id',id);if(result.error)status('adminStatus','Action failed: '+result.error.message);else status('adminStatus',action==='delete'?'Wish deleted.':'Wish visibility updated.');await load();});
-$('search').addEventListener('input',render);$('refresh').addEventListener('click',load);$('export').addEventListener('click',()=>{const csv=[['Name','Wish','Created at','Visible'],...rows.map(r=>[r.name,r.message,r.created_at,r.is_visible?'Yes':'No'])].map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='balaji-gajapriya-guestbook.csv';a.click();URL.revokeObjectURL(a.href);});
+$('search').addEventListener('input',render);$('refresh').addEventListener('click',load);async function exportAllWishes(){
+  const button=$('export');
+  button.disabled=true;
+  status('adminStatus','Preparing CSV export…');
+  try {
+    const allRows=[];
+    const pageSize=1000;
+    for(let from=0;;from+=pageSize){
+      const {data,error}=await db.from('guestbook_wishes')
+        .select('id,name,message,created_at,is_visible')
+        .order('created_at',{ascending:false})
+        .range(from,from+pageSize-1);
+      if(error) throw error;
+      allRows.push(...(data||[]));
+      if(!data || data.length<pageSize) break;
+    }
+    const quote=value=>'"'+String(value??'').replace(/"/g,'""')+'"';
+    const csv=[
+      ['Name','Wish','Created at','Visible'],
+      ...allRows.map(r=>[r.name,r.message,r.created_at,r.is_visible?'Yes':'No'])
+    ].map(row=>row.map(quote).join(',')).join('\r\n');
+    // UTF-8 BOM helps Excel display Tamil, emojis and other Unicode correctly.
+    const blob=new Blob(['\\uFEFF',csv],{type:'text/csv;charset=utf-8'});
+    const objectUrl=window.URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=objectUrl;
+    a.download='balaji-gajapriya-guestbook.csv';
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.setTimeout(()=>window.URL.revokeObjectURL(objectUrl),1500);
+    status('adminStatus',`Exported ${allRows.length} wishes to CSV.`);
+  } catch(error) {
+    console.error('Guestbook CSV export failed:',error);
+    status('adminStatus','CSV export failed: '+(error.message||'Please try again.'));
+  } finally {
+    button.disabled=false;
+  }
+}
+$('export').addEventListener('click',exportAllWishes);
 $('loginForm').addEventListener('submit',async e=>{e.preventDefault();$('loginButton').disabled=true;status('loginStatus','Signing in…');const {error}=await db.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error){status('loginStatus',error.message);$('loginButton').disabled=false;return;}try{await isAdmin();$('loginPanel').classList.add('hidden');$('dashboard').classList.remove('hidden');await load();}catch(err){await db.auth.signOut();status('loginStatus',err.message);$('loginButton').disabled=false;}});
 $('signOut').addEventListener('click',async()=>{await db.auth.signOut();$('dashboard').classList.add('hidden');$('loginPanel').classList.remove('hidden');$('loginButton').disabled=false;});
 (async()=>{const {data}=await db.auth.getSession();if(data.session){try{await isAdmin();$('loginPanel').classList.add('hidden');$('dashboard').classList.remove('hidden');await load();}catch(e){await db.auth.signOut();}}})();
