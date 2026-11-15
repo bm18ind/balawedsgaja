@@ -98,6 +98,14 @@
     const nextIndex = clamp(index);
     const changed = nextIndex !== activeIndex;
     activeIndex = nextIndex;
+    if (chapterNumberList) {
+      chapterNumberList.querySelectorAll('.chapter-number').forEach((button, index) => {
+        const active = index === activeIndex;
+        button.classList.toggle('is-active', active);
+        if (active) button.setAttribute('aria-current', 'page');
+        else button.removeAttribute('aria-current');
+      });
+    }
     scenes.forEach((scene, i) => {
       scene.classList.toggle('is-current', i === activeIndex);
       if (isMobile && !stage) scene.classList.toggle('show-copy', i === activeIndex);
@@ -401,16 +409,19 @@
   }
 
 
-  // The original left-side progress meter is also a chapter jump control.
-  // Clicking anywhere along its vertical track jumps to the matching chapter.
+  // Numbered chapter navigation: each circle jumps directly to its scene.
   const storyProgress = document.getElementById('storyProgress');
-  storyProgress?.addEventListener('click', event => {
-    const track = storyProgress.querySelector('.story-progress__track');
-    if (!track) return;
-    const rect = track.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
-    goToScene(Math.round(ratio * (scenes.length - 1)));
-  });
+  const chapterNumberList = document.getElementById('chapterNumberList');
+  if (chapterNumberList) {
+    chapterNumberList.innerHTML = scenes.map((scene, index) =>
+      `<button class="chapter-number" type="button" data-chapter-index="${index}" aria-label="Go to page ${index + 1}" title="Page ${index + 1}">${index + 1}</button>`
+    ).join('');
+    chapterNumberList.addEventListener('click', event => {
+      const button = event.target.closest('[data-chapter-index]');
+      if (!button) return;
+      goToScene(Number(button.dataset.chapterIndex));
+    });
+  }
 
   prevButton?.addEventListener('click', () => goToScene(activeIndex - 1));
   nextButton?.addEventListener('click', () => goToScene(activeIndex + 1));

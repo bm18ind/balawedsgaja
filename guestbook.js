@@ -47,7 +47,12 @@
   };
   const restartRotation = () => {
     if (rotateTimer) clearInterval(rotateTimer);
-    rotateTimer = wishes.length > 1 ? setInterval(() => move(1), 5000) : null;
+    const currentMessage = wishes[current]?.message || '';
+    const wordCount = currentMessage.trim() ? currentMessage.trim().split(/\\s+/).length : 0;
+    // Give long wishes time to read: visitors can move them manually with the arrows.
+    rotateTimer = wishes.length > 1 && wordCount <= 80
+      ? setInterval(() => move(1), 5000)
+      : null;
   };
   const addWish = row => {
     if (!row || wishes.some(w => w.id === row.id)) return;
