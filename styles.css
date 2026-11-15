@@ -2580,3 +2580,184 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     transform-origin: center center !important;
   }
 }
+
+
+/* MOBILE FINAL CORRECTION
+   Keep the directional wipe. The incoming chapter is revealed as a complete
+   viewport frame; remove the extra mobile image zoom that made edges appear cut. */
+@media (max-width: 700px), (pointer: coarse) {
+  html.stage #story > .scene {
+    clip-path: none;
+    -webkit-clip-path: none;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  html.stage #story > .scene .scene-image {
+    transform: none !important;
+    scale: 1 !important;
+    translate: 0 0 !important;
+    object-position: center center;
+  }
+  html.stage #story > .scene.is-current .scene-image,
+  html.stage #story > .scene.show-copy .scene-image {
+    transform: none !important;
+    scale: 1 !important;
+    translate: 0 0 !important;
+  }
+
+  /* Chapter 15: reserve a clear gutter for the left chapter markers.
+     The panel is centred in the remaining usable width, not underneath them. */
+  #scene-15 .guestbook-panel {
+    left: calc(50% + 22px) !important;
+    top: 43% !important;
+    width: calc(100vw - 76px) !important;
+    max-width: calc(100vw - 76px) !important;
+    max-height: calc(100svh - 150px) !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+    padding: 6px 5px !important;
+    overflow: visible !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-15.show-copy .guestbook-panel {
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-15 .guestbook-main-title {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 6px !important;
+    padding: 0 !important;
+    text-align: center !important;
+    font-size: clamp(25px, 6.3vw, 32px) !important;
+    line-height: 1.02 !important;
+  }
+  #scene-15 .guestbook-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto auto !important;
+    gap: 6px !important;
+    align-items: start !important;
+  }
+  #scene-15 .guestbook-wishes-card {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 8px 10px !important;
+    border-radius: 14px !important;
+  }
+  #scene-15 .guestbook-wishes-card h2 {
+    font-size: clamp(18px, 4.8vw, 22px) !important;
+    line-height: 1.05 !important;
+    margin: 0 0 3px !important;
+  }
+  #scene-15 .guestbook-wishes-card h3 {
+    font-size: 9px !important;
+    line-height: 1.25 !important;
+    margin: 0 0 5px !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card {
+    display: block !important;
+    box-sizing: border-box !important;
+    height: clamp(92px, 15svh, 118px) !important;
+    min-height: 92px !important;
+    max-height: 118px !important;
+    padding: 9px 10px 11px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card p {
+    font-size: 14px !important;
+    line-height: 1.35 !important;
+    margin: 0 0 7px !important;
+    overflow-wrap: anywhere !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-footer {
+    margin-top: 4px !important;
+  }
+  #scene-15 .guestbook-form-card {
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 8px 10px 9px !important;
+    border-radius: 14px !important;
+  }
+  #scene-15 .guestbook-form-card h2 {
+    font-size: clamp(18px, 4.7vw, 22px) !important;
+    line-height: 1.05 !important;
+    margin: 0 0 3px !important;
+  }
+  #scene-15 .guestbook-form-card h3 {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    margin: 0 0 4px !important;
+  }
+  #scene-15 .guestbook-form {
+    display: grid !important;
+    gap: 3px !important;
+  }
+  #scene-15 .guestbook-form label {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+    margin: 1px 0 0 !important;
+  }
+  #scene-15 .guestbook-form input {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 5px 8px !important;
+    font-size: 16px !important;
+  }
+  #scene-15 .guestbook-form textarea {
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 5px 8px !important;
+    font-size: 16px !important;
+    line-height: 1.25 !important;
+  }
+  #scene-15 .guestbook-form .turnstile-wrap {
+    min-height: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    transform: scale(.76) !important;
+    transform-origin: left center !important;
+  }
+  #scene-15 .guestbook-form .guestbook-submit {
+    min-height: 30px !important;
+    height: 30px !important;
+    padding: 5px 11px !important;
+    font-size: 8px !important;
+  }
+  #scene-15 .guestbook-form .guestbook-status {
+    display: block !important;
+    min-height: 17px !important;
+    height: auto !important;
+    margin: 2px 0 0 !important;
+    padding: 1px 0 0 !important;
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    overflow: visible !important;
+  }
+}
+
+/* Short phone screens: compress the wishes window and form a little further,
+   keeping the saved confirmation above the fixed chapter controls. */
+@media (max-height: 740px) and (max-width: 700px) {
+  #scene-15 .guestbook-panel {
+    top: 41% !important;
+    max-height: calc(100svh - 142px) !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card {
+    height: 86px !important;
+    min-height: 86px !important;
+    max-height: 86px !important;
+  }
+  #scene-15 .guestbook-form textarea {
+    height: 34px !important;
+    min-height: 34px !important;
+  }
+  #scene-15 .guestbook-form .turnstile-wrap {
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+}

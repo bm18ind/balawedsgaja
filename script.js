@@ -255,28 +255,16 @@
       // 1. the outgoing text lifts away
       leaveCopy(from, dir);
 
-      // 2. Reveal the next photograph.
-      // On phones, use a gentle cross-dissolve instead of a directional wipe.
-      // The wipe made the outgoing page look as though it was being cut/cropped
-      // while the next page entered. A cross-dissolve keeps both frames whole.
-      const timing = { duration: isMobile ? 760 : T.wipe, delay: isMobile ? 0 : T.wipeDelay, easing: isMobile ? 'ease-in-out' : EASE_WIPE, fill: 'both' };
+      // 2. Reveal the next photograph with the original directional wipe
+      // on BOTH desktop and mobile. Only the incoming scene is masked; the
+      // outgoing scene remains a complete, stationary frame underneath it.
+      const timing = { duration: T.wipe, delay: T.wipeDelay, easing: EASE_WIPE, fill: 'both' };
       let veil = null;
-      if (isMobile) {
-        track(to._temp, to.animate(
-          [{ opacity: 0 }, { opacity: 1 }],
-          timing
-        ));
-        track(from._temp, from.animate(
-          [{ opacity: 1 }, { opacity: 0 }],
-          timing
-        ));
-      } else {
-        const wipeFrames = dir > 0
-          ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
-          : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
-        track(to._temp, to.animate(wipeFrames, timing));
-        track(from._temp, from.animate([{ opacity: 1 }, { opacity: 1 }], timing));
-      }
+      const wipeFrames = dir > 0
+        ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
+        : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
+      track(to._temp, to.animate(wipeFrames, timing));
+      track(from._temp, from.animate([{ opacity: 1 }, { opacity: 1 }], timing));
       photoEnter(to, dir);
 
       // 3. the new text arrives once the photograph has landed
