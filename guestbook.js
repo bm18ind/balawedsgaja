@@ -34,6 +34,16 @@
     }
     const item = wishes[current];
     message.textContent = item.message;
+    // Reset immediately and again after layout: some mobile browsers calculate
+    // the scroll height only after the updated text has been painted.
+    const wishScroller = message.closest('.wish-card');
+    if (wishScroller) {
+      wishScroller.scrollTop = 0;
+      requestAnimationFrame(() => {
+        wishScroller.scrollTop = 0;
+        wishScroller.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      });
+    }
     name.textContent = `— ${item.name}`;
     $('wishCount').textContent = `${wishes.length} ${wishes.length === 1 ? 'wish' : 'wishes'}`;
     $('wishPosition').textContent = `${current + 1} / ${wishes.length}`;

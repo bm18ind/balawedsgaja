@@ -2107,3 +2107,285 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     line-height: 1.48 !important;
   }
 }
+
+
+/* Refined chapter navigation: a quiet film-index rail rather than a stack of bubbles. */
+.story-progress.chapter-number-nav {
+  left: 17px !important;
+  width: 34px !important;
+  background: transparent !important;
+}
+.chapter-number-list {
+  position: relative !important;
+  width: 34px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 3px 0 !important;
+}
+.chapter-number-list::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, transparent, rgba(232,211,164,.42) 12%, rgba(232,211,164,.42) 88%, transparent);
+  pointer-events: none;
+}
+.chapter-number {
+  position: relative !important;
+  z-index: 1 !important;
+  flex: 0 0 22px !important;
+  width: 28px !important;
+  height: 22px !important;
+  min-width: 28px !important;
+  border: 0 !important;
+  border-radius: 5px !important;
+  background: rgba(15,14,12,.24) !important;
+  color: rgba(248,241,226,.62) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  font: 500 9px/1 var(--sans) !important;
+  letter-spacing: .04em !important;
+  transition: color .2s ease, background .2s ease, width .2s ease, transform .2s ease !important;
+}
+.chapter-number:hover {
+  color: #f3dfb6 !important;
+  background: rgba(232,211,164,.12) !important;
+  transform: translateX(2px) !important;
+}
+.chapter-number.is-active {
+  width: 34px !important;
+  background: rgba(232,211,164,.96) !important;
+  color: #211e18 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,.22) !important;
+  font-weight: 700 !important;
+  transform: translateX(2px) !important;
+}
+@media (max-width: 700px), (pointer: coarse) {
+  .story-progress.chapter-number-nav {
+    left: 5px !important;
+    width: 27px !important;
+    height: min(70vh, 620px) !important;
+    max-height: calc(100svh - 120px) !important;
+  }
+  .chapter-number-list { width: 27px !important; }
+  .chapter-number {
+    flex-basis: 18px !important;
+    width: 24px !important;
+    height: 18px !important;
+    min-width: 24px !important;
+    font-size: 8px !important;
+    border-radius: 4px !important;
+  }
+  .chapter-number.is-active {
+    width: 27px !important;
+    transform: none !important;
+  }
+}
+
+/* Guestbook: keep the title clear of the floating music control on phones. */
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-15 .guestbook-main-title {
+    width: calc(100% - 58px) !important;
+    max-width: calc(100% - 58px) !important;
+    margin: 0 auto 9px 2px !important;
+    text-align: left !important;
+    padding-left: 2px !important;
+  }
+
+  /* The wishes window is a true nested scroll region on touch screens. */
+  #scene-15 .guestbook-wishes-card .wish-card {
+    display: block !important;
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    height: clamp(155px, 25svh, 220px) !important;
+    max-height: min(34svh, 270px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-y: contain !important;
+    touch-action: pan-y !important;
+    scroll-padding-top: 14px !important;
+    padding: 14px 15px 18px !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card p {
+    display: block !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+}
+
+/* Desktop and mobile: reset to the beginning of every wish and avoid top-line clipping. */
+#scene-15 .guestbook-wishes-card .wish-card {
+  box-sizing: border-box !important;
+  scroll-behavior: auto !important;
+  scroll-padding-top: 14px !important;
+  touch-action: pan-y !important;
+}
+#scene-15 .guestbook-wishes-card .wish-card p {
+  margin-top: 0 !important;
+  padding-top: 1px !important;
+}
+
+
+/* Final layout corrections requested after device review. */
+
+/* The message paragraph itself must remain at the top of the scroll flow.
+   Avoid flex shrinking/centering which can push the first lines above the
+   scroll viewport in some browsers. */
+#scene-15 .guestbook-wishes-card .wish-card {
+  display: block !important;
+  position: relative !important;
+  padding: 22px 17px 20px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scroll-padding-block-start: 22px !important;
+  overflow-anchor: none !important;
+}
+#scene-15 .guestbook-wishes-card .wish-card #wishMessage {
+  display: block !important;
+  position: relative !important;
+  inset: auto !important;
+  flex: none !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  margin: 0 0 14px !important;
+  padding: 0 !important;
+  transform: none !important;
+  translate: none !important;
+  line-height: 1.55 !important;
+  overflow: visible !important;
+}
+#scene-15 .guestbook-wishes-card .wish-card #wishName {
+  display: block !important;
+  position: relative !important;
+  flex: none !important;
+  margin: 0 !important;
+}
+
+/* Desktop chapter 15: lift the complete guestbook panel so it clears the
+   fixed BACK / CONTINUE controls at the bottom of the screen. */
+@media (min-width: 701px) and (pointer: fine) {
+  #scene-15 .guestbook-panel {
+    top: 44% !important;
+    max-height: 74vh !important;
+    overflow-y: auto !important;
+    padding-bottom: 24px !important;
+  }
+  #scene-15 .guestbook-main-title {
+    margin-bottom: 12px !important;
+  }
+}
+
+/* Desktop chapter 16: centre the closing text block in the frame. */
+@media (min-width: 701px) and (pointer: fine) {
+  #scene-16 .closing-copy {
+    left: 50% !important;
+    right: auto !important;
+    top: 50% !important;
+    bottom: auto !important;
+    width: min(900px, 84vw) !important;
+    max-width: 84vw !important;
+    text-align: center !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-16.show-copy .closing-copy {
+    transform: translate(-50%, -50%) !important;
+  }
+}
+
+
+/* Compact chapter markers: tiny inactive squares, expanded numbered active square. */
+.story-progress.chapter-number-nav {
+  width: 28px !important;
+}
+.chapter-number-list {
+  width: 28px !important;
+}
+.chapter-number {
+  flex: 0 0 7px !important;
+  width: 7px !important;
+  height: 7px !important;
+  min-width: 7px !important;
+  border-radius: 2px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+  color: transparent !important;
+  background: rgba(232,211,164,.34) !important;
+  border: 1px solid rgba(232,211,164,.62) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition:
+    width .28s ease,
+    height .28s ease,
+    flex-basis .28s ease,
+    background .28s ease,
+    color .2s ease,
+    border-color .28s ease,
+    box-shadow .28s ease,
+    transform .28s ease !important;
+}
+.chapter-number:hover,
+.chapter-number:focus-visible {
+  flex-basis: 25px !important;
+  width: 25px !important;
+  height: 25px !important;
+  min-width: 25px !important;
+  border-radius: 6px !important;
+  font-size: 10px !important;
+  color: #e8d3a4 !important;
+  background: rgba(22,21,18,.78) !important;
+  border-color: #e8d3a4 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2) !important;
+  transform: scale(1) !important;
+}
+.chapter-number.is-active {
+  flex-basis: 27px !important;
+  width: 27px !important;
+  height: 27px !important;
+  min-width: 27px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  color: #211e18 !important;
+  background: #e8d3a4 !important;
+  border: 1px solid #e8d3a4 !important;
+  box-shadow: 0 0 0 3px rgba(232,211,164,.18), 0 3px 12px rgba(0,0,0,.2) !important;
+  transform: scale(1) !important;
+}
+@media (max-width: 700px), (pointer: coarse) {
+  .story-progress.chapter-number-nav {
+    width: 24px !important;
+  }
+  .chapter-number-list {
+    width: 24px !important;
+  }
+  .chapter-number {
+    flex-basis: 6px !important;
+    width: 6px !important;
+    height: 6px !important;
+    min-width: 6px !important;
+  }
+  .chapter-number:hover,
+  .chapter-number:focus-visible {
+    flex-basis: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    font-size: 9px !important;
+  }
+  .chapter-number.is-active {
+    flex-basis: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    font-size: 10px !important;
+  }
+}

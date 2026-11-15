@@ -365,11 +365,18 @@
     document.addEventListener('touchstart', event => {
       if (event.touches.length !== 1) { touch = null; return; }
       const point = event.touches[0];
-      touch = { x: point.clientX, y: point.clientY };
+      // The guestbook wish is an independently scrollable reading area.
+      // Finger gestures that begin there must never be converted into chapter changes.
+      const wishScroller = event.target instanceof Element
+        ? event.target.closest('#scene-15 .wish-card')
+        : null;
+      touch = { x: point.clientX, y: point.clientY, inWishScroller: !!wishScroller };
     }, { passive: true, capture: true });
 
     document.addEventListener('touchmove', event => {
       if (!touch || event.touches.length !== 1) return;
+      // Let the browser perform native momentum scrolling inside a long wish.
+      if (touch.inWishScroller) return;
       const point = event.touches[0];
       const dy = touch.y - point.clientY;
       const dx = touch.x - point.clientX;
@@ -381,8 +388,10 @@
       const point = event.changedTouches[0];
       const dy = touch.y - point.clientY;
       const dx = touch.x - point.clientX;
+      const beganInWishScroller = touch.inWishScroller;
       touch = null;
 
+      if (beganInWishScroller) return;
       if (touchNavigationLocked) return;
       if (Math.abs(dy) < 38 || Math.abs(dy) < Math.abs(dx) * 1.2) return;
       if (scrollerOf(event.target, dy > 0 ? 1 : -1)) return;
