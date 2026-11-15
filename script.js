@@ -31,10 +31,11 @@
     stagger: 85,                       // gap between lines of text
     child: 700,                        // each line's fade and rise
     cooldown: 100,                     // brief settle before the next queued change
-    drift: isMobile ? 7000 : 9500      // slow cinematic push-in on each photograph
+    drift: isMobile ? 9000 : 9500      // slow cinematic push-in on each photograph
   };
   const EASE_WIPE = 'cubic-bezier(.22,1,.36,1)';
   const EASE_OUT = 'cubic-bezier(.16,1,.3,1)';
+  const EASE_ZOOM = 'cubic-bezier(.25,.46,.45,.94)'; // steady, gentle zoom-in on mobile
 
   // Guided auto-advance: give each chapter time to be viewed, but hand over
   // control permanently as soon as the visitor interacts with the page.
@@ -227,11 +228,11 @@
       if (!image || getComputedStyle(image).objectFit === 'contain') return;
       const index = scenes.indexOf(scene);
       const from = 1;
-      const to = isMobile ? 1 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
+      const to = isMobile ? 1.06 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
       const shift = isMobile ? 0 : dir * ((from - 1) / 2) * 85;
       track(scene._anims, image.animate(
         [{ scale: from, translate: `0 ${shift}%` }, { scale: to, translate: '0 0%' }],
-        { duration: T.drift, easing: EASE_OUT, fill: 'both' }
+        { duration: T.drift, easing: isMobile ? EASE_ZOOM : EASE_OUT, fill: 'both' }
       ));
     };
 

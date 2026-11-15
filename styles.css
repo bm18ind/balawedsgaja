@@ -2579,15 +2579,17 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
   }
   html.stage #story > .scene .scene-image {
     transform: none !important;
-    scale: 1 !important;
-    translate: 0 0 !important;
+    /* Never crop the photograph into an inset frame, including the outgoing page
+       as it hands over to the next one. */
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
     object-position: center center;
   }
   html.stage #story > .scene.is-current .scene-image,
   html.stage #story > .scene.show-copy .scene-image {
     transform: none !important;
-    scale: 1 !important;
-    translate: 0 0 !important;
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
   }
 
   /* Chapter 15: reserve a clear gutter for the left chapter markers.
