@@ -153,6 +153,45 @@ button:disabled{opacity:.5;cursor:wait;transform:none}
       </article>`).join('') : '<div class="empty">No wishes match your search.</div>';
   }
 
+  async function announceGuestbookChange() {
+    // Broadcast refresh notification to public guestbook pages. It contains
+    // no wish data; each page reloads only the currently visible wishes.
+    const channel = db.channel('public-guestbook-wishes');
+    await new Promise(resolve => {
+      let settled = false;
+      const finish = value => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+      const timeout = window.setTimeout(() => finish(false), 5000);
+      channel.subscribe(state => {
+        if (state === 'SUBSCRIBED') {
+          window.clearTimeout(timeout);
+          finish(true);
+        } else if (state === 'CHANNEL_ERROR' || state === 'TIMED_OUT' || state === 'CLOSED') {
+          window.clearTimeout(timeout);
+          finish(false);
+        }
+      });
+    }).then(async connected => {
+      if (!connected) {
+        console.warn('Guestbook update saved, but the live refresh notification could not be sent.');
+        await db.removeChannel(channel);
+        return;
+      }
+      try {
+        await channel.send({
+          type: 'broadcast',
+          event: 'guestbook-changed',
+          payload: { changedAt: new Date().toISOString() }
+        });
+      } finally {
+        await db.removeChannel(channel);
+      }
+    });
+  }
+
   $('wishList').addEventListener('click', async event => {
     const button = event.target.closest('button[data-action]');
     if (!button) return;
@@ -165,8 +204,12 @@ button:disabled{opacity:.5;cursor:wait;transform:none}
     const result = action === 'toggle'
       ? await db.from('guestbook_wishes').update({ is_visible: !row.is_visible }).eq('id', id)
       : await db.from('guestbook_wishes').delete().eq('id', id);
-    if (result.error) status('adminStatus', 'Action failed: ' + result.error.message);
-    else status('adminStatus', action === 'delete' ? 'Wish deleted.' : 'Wish visibility updated.');
+    if (result.error) {
+      status('adminStatus', 'Action failed: ' + result.error.message);
+    } else {
+      status('adminStatus', action === 'delete' ? 'Wish deleted.' : 'Wish visibility updated.');
+      await announceGuestbookChange();
+    }
     await load();
   });
 

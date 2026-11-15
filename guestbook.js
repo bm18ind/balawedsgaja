@@ -132,13 +132,44 @@
     }
   });
 
+  // Admin visibility changes and deletions are announced over Broadcast.
+  // This is deliberate: an anonymous visitor may no longer be allowed to
+  // receive a Postgres UPDATE event once a wish becomes hidden under RLS.
+  let refreshInProgress = false;
+  let refreshQueued = false;
+  const refreshWishes = async () => {
+    if (refreshInProgress) { refreshQueued = true; return; }
+    refreshInProgress = true;
+    try {
+      do {
+        refreshQueued = false;
+        await loadWishes();
+      } while (refreshQueued);
+    } finally {
+      refreshInProgress = false;
+    }
+  };
+
   loadWishes();
   if (client) {
     channel = client.channel('public-guestbook-wishes')
+      .on('broadcast', { event: 'guestbook-changed' }, () => {
+        refreshWishes();
+      })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_wishes' }, payload => {
         if (payload.new?.is_visible) addWish(payload.new);
       })
-      .subscribe(status => { if (status === 'CHANNEL_ERROR') console.warn('Guestbook live updates unavailable; refresh to see new wishes.'); });
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guestbook_wishes' }, () => {
+        refreshWishes();
+      })
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'guestbook_wishes' }, () => {
+        refreshWishes();
+      })
+      .subscribe(status => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn('Guestbook live updates unavailable; refresh to see new wishes.');
+        }
+      });
   }
   window.addEventListener('beforeunload', () => { if (rotateTimer) clearInterval(rotateTimer); if (channel && client) client.removeChannel(channel); });
 })();
