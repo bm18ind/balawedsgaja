@@ -2988,3 +2988,18 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     max-height: 132px !important;
   }
 }
+
+
+/* Page 14 (family) on phones: fill the space above and below the photograph with
+   the same soft gradient that sits behind page 15 (guestbook). */
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-14 {
+    background:
+      radial-gradient(ellipse at 18% 15%, rgba(112,91,58,.24), transparent 43%),
+      radial-gradient(ellipse at 84% 85%, rgba(88,72,48,.20), transparent 42%),
+      linear-gradient(135deg, #211f1b 0%, #171613 55%, #242119 100%) !important;
+  }
+  #scene-14 .family-image {
+    background: transparent !important;
+  }
+}

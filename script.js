@@ -225,10 +225,12 @@
     // ----- photographs -------------------------------------------------------
     const photoEnter = (scene, dir) => {
       const { image } = partsOf(scene);
-      if (!image || getComputedStyle(image).objectFit === 'contain') return;
+      const isFamily = scene.classList.contains('family-scene');
+      if (!image || (getComputedStyle(image).objectFit === 'contain' && !isFamily)) return;
       const index = scenes.indexOf(scene);
       const from = 1;
-      const to = isMobile ? 1.06 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
+      // The family photograph is shown whole (never cropped), so its zoom is kept extra gentle.
+      const to = isFamily ? (isMobile ? 1.04 : 1.03) : isMobile ? 1.06 : ([4, 5, 6].includes(index) ? 1.075 : 1.035);
       const shift = isMobile ? 0 : dir * ((from - 1) / 2) * 85;
       track(scene._anims, image.animate(
         [{ scale: from, translate: `0 ${shift}%` }, { scale: to, translate: '0 0%' }],
