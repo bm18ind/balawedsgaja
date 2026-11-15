@@ -1495,3 +1495,26 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
 @media (prefers-reduced-motion: reduce) {
   .scene-image { transition: none !important; }
 }
+
+
+/* Guestbook chapter: frosted-glass panel, responsive and self-contained. */
+#scene-15 .guestbook-panel{left:50%;top:50%;bottom:auto;transform:translate(-50%,calc(-50% + 22px));width:min(650px,88vw);max-width:88vw;max-height:82svh;overflow-y:auto;overscroll-behavior:contain;padding:clamp(18px,2.2vw,30px);background:rgba(246,240,226,.88);color:#29251d;border:1px solid rgba(255,255,255,.78);box-shadow:0 18px 60px rgba(0,0,0,.2);backdrop-filter:blur(16px) saturate(125%);-webkit-backdrop-filter:blur(16px) saturate(125%);text-align:left;pointer-events:none}
+#scene-15.show-copy .guestbook-panel{transform:translate(-50%,-50%)}
+#scene-15 .guestbook-panel h2{font-size:clamp(38px,4.4vw,58px);margin:0 0 8px;color:#29251d}
+#scene-15 .guestbook-panel .eyebrow{color:#96702a;margin-bottom:8px}
+.guestbook-intro{font-size:14px;line-height:1.55;color:#655b4b;margin:0 0 15px;max-width:520px}
+.guestbook-form{display:grid;gap:7px}
+.guestbook-form label{font-size:9px;letter-spacing:.15em;color:#806020;font-weight:600;margin-top:3px}
+.guestbook-form input,.guestbook-form textarea{width:100%;border:1px solid rgba(65,54,35,.22);border-radius:11px;background:rgba(255,255,255,.72);padding:11px 13px;color:#29251d;font:400 14px var(--sans);outline:none;resize:vertical;min-height:42px}
+.guestbook-form textarea{min-height:74px}
+.guestbook-form input:focus,.guestbook-form textarea:focus{border-color:#9a783b;box-shadow:0 0 0 3px rgba(154,120,59,.12)}
+.turnstile-wrap{min-height:65px;display:flex;align-items:center;justify-content:flex-start;overflow:hidden;margin-top:3px}
+.guestbook-submit{justify-self:start;background:#27231b!important;color:#fff!important;border-color:#27231b!important;padding:12px 17px!important}
+.guestbook-submit:disabled{opacity:.55;cursor:wait}
+.guestbook-status{min-height:17px;margin:0;color:#655b4b;font-size:12px}
+.guestbook-status.is-error{color:#a13e32}.guestbook-status.is-success{color:#3f704a}
+.guestbook-divider{height:1px;background:rgba(65,54,35,.17);margin:14px 0 10px}
+.wish-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#806020;font-size:9px;letter-spacing:.14em;font-weight:600}.wish-heading small{font-size:10px;letter-spacing:0;color:#776e60;font-weight:400}
+.wish-card{min-height:76px;padding:10px 0 4px}.wish-card p{font:italic 17px/1.5 var(--serif);color:#302a20;margin:0 0 7px;overflow-wrap:anywhere}.wish-card strong{font-size:11px;color:#806020;font-weight:600;letter-spacing:.04em}
+.wish-controls{display:flex;align-items:center;gap:14px;justify-content:flex-end;color:#776e60;font-size:10px}.wish-controls button{width:28px;height:28px;border:1px solid rgba(65,54,35,.28);border-radius:50%;background:transparent;color:#514735;font-size:21px;line-height:1;cursor:pointer}.wish-controls button:disabled{opacity:.3;cursor:default}
+@media(max-width:700px){#scene-15 .guestbook-panel{top:48%;width:92vw;max-width:92vw;max-height:76svh;padding:16px 17px;transform:translate(-50%,calc(-50% + 18px))}#scene-15.show-copy .guestbook-panel{transform:translate(-50%,-50%)}#scene-15 .guestbook-panel h2{font-size:38px}.guestbook-intro{font-size:12px;margin-bottom:10px}.guestbook-form input,.guestbook-form textarea{font-size:13px;padding:9px 11px}.guestbook-form textarea{min-height:60px}.guestbook-divider{margin:9px 0 7px}.wish-card{min-height:64px}.wish-card p{font-size:15px}.turnstile-wrap{min-height:62px}.guestbook-submit{font-size:9px!important}}

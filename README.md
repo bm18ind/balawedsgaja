@@ -74,3 +74,14 @@ The Add to Google Calendar button opens a pre-filled Google Calendar event for 2
 ## Publish with GitHub Pages
 
 Upload the contents of this folder to the root of a GitHub repository. In repository Settings → Pages, select Deploy from a branch, choose `main` and `/(root)`, then save.
+
+
+## Guestbook integration
+The public guestbook is configured in `guestbook.js` with the Supabase Project URL, publishable key, `submit-guestbook` Edge Function and Cloudflare Turnstile site key. The service-role key and Turnstile secret must remain in Supabase Edge Function secrets only.
+
+For live wish updates, enable Realtime for `public.guestbook_wishes` in Supabase. The public read policy should allow SELECT only where `is_visible = true`. The `submit-guestbook` Edge Function validates Turnstile and writes wishes using its server-side service-role key.
+
+The private admin dashboard and its admin-only UPDATE/DELETE policies are a separate protected setup step; do not expose any service-role credentials in this static website.
+
+## Private guestbook admin
+Open `/admin.html` on the deployed site and sign in with the Supabase Auth email/password for the admin user. Before using it, run `guestbook-admin-policies.sql` in the Supabase SQL Editor and confirm your auth user UUID is present in `public.guestbook_admins`. The page supports hiding/restoring, permanent deletion, search and CSV export. It is protected by Supabase Auth and row-level security; the URL itself is not the security boundary.
