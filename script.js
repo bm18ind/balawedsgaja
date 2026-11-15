@@ -255,17 +255,28 @@
       // 1. the outgoing text lifts away
       leaveCopy(from, dir);
 
-      // 2. the next photograph opens over it
-      const timing = { duration: T.wipe, delay: T.wipeDelay, easing: EASE_WIPE, fill: 'both' };
+      // 2. Reveal the next photograph.
+      // On phones, use a gentle cross-dissolve instead of a directional wipe.
+      // The wipe made the outgoing page look as though it was being cut/cropped
+      // while the next page entered. A cross-dissolve keeps both frames whole.
+      const timing = { duration: isMobile ? 760 : T.wipe, delay: isMobile ? 0 : T.wipeDelay, easing: isMobile ? 'ease-in-out' : EASE_WIPE, fill: 'both' };
       let veil = null;
-      // Both desktop and mobile use a clean directional wipe. Keep the
-      // outgoing image stationary and fully framed: no translate, zoom,
-      // inset mask, or extra dark veil that makes the old page look cropped.
-      const wipeFrames = dir > 0
-        ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
-        : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
-      track(to._temp, to.animate(wipeFrames, timing));
-      track(from._temp, from.animate([{ opacity: 1 }, { opacity: 1 }], timing));
+      if (isMobile) {
+        track(to._temp, to.animate(
+          [{ opacity: 0 }, { opacity: 1 }],
+          timing
+        ));
+        track(from._temp, from.animate(
+          [{ opacity: 1 }, { opacity: 0 }],
+          timing
+        ));
+      } else {
+        const wipeFrames = dir > 0
+          ? [{ clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }]
+          : [{ clipPath: 'inset(0% 0% 100% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)' }];
+        track(to._temp, to.animate(wipeFrames, timing));
+        track(from._temp, from.animate([{ opacity: 1 }, { opacity: 1 }], timing));
+      }
       photoEnter(to, dir);
 
       // 3. the new text arrives once the photograph has landed
@@ -344,6 +355,12 @@
     document.addEventListener('wheel', event => {
       if (event.ctrlKey || event.metaKey) return;
       if (Math.abs(event.deltaY) <= Math.abs(event.deltaX) || Math.abs(event.deltaY) < 10) return;
+      // The wishes panel is a reading area, not a chapter-navigation gesture
+      // zone. Never change chapters while the pointer is over the wish text,
+      // even when the wish has reached its top or bottom edge.
+      const inWishReadingArea = event.target instanceof Element &&
+        event.target.closest('#scene-15 .guestbook-wishes-card .wish-card');
+      if (inWishReadingArea) return;
       if (scrollerOf(event.target, event.deltaY > 0 ? 1 : -1)) return;
       event.preventDefault();
 

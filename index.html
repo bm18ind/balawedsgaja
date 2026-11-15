@@ -134,4 +134,32 @@
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script src="guestbook.js"></script>
 <script src="script.js"></script>
+
+  <script>
+    // Discourage casual saving of the public-facing wedding photographs.
+    // This is a deterrent only; images remain retrievable by determined visitors.
+    (() => {
+      const imageArea = (target) => {
+        if (!(target instanceof Element)) return false;
+        return Boolean(target.closest(
+          '.scene, .scene-image, .bride-carousel, .groom-carousel, .carousel, .carousel-track, .carousel-slide, .gallery'
+        ));
+      };
+
+      document.addEventListener('contextmenu', (event) => {
+        if (imageArea(event.target)) event.preventDefault();
+      }, { capture: true });
+
+      document.addEventListener('dragstart', (event) => {
+        if (event.target instanceof HTMLImageElement || imageArea(event.target)) {
+          event.preventDefault();
+        }
+      }, { capture: true });
+
+      document.addEventListener('selectstart', (event) => {
+        if (event.target instanceof HTMLImageElement) event.preventDefault();
+      }, { capture: true });
+    })();
+  </script>
+
 </body></html>

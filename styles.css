@@ -2389,3 +2389,194 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     font-size: 10px !important;
   }
 }
+
+
+/* Guestbook refinement: desktop content fits as a single panel, without a
+   second page scrollbar; the wishes text remains a protected reading area. */
+@media (min-width: 701px) and (pointer: fine) {
+  #scene-15 .guestbook-panel {
+    top: 48% !important;
+    left: 50% !important;
+    width: min(1040px, 90vw) !important;
+    max-width: min(1040px, 90vw) !important;
+    max-height: calc(100vh - 112px) !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    padding: clamp(18px, 2vw, 26px) !important;
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-15.show-copy .guestbook-panel {
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-15 .guestbook-main-title {
+    font-size: clamp(34px, 3.6vw, 48px) !important;
+    line-height: 1.02 !important;
+    margin: 0 0 12px !important;
+  }
+  #scene-15 .guestbook-layout {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr) !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+  }
+  #scene-15 .guestbook-card:first-child,
+  #scene-15 .guestbook-card:last-child {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 16px 18px !important;
+  }
+  #scene-15 .guestbook-wishes-card h2,
+  #scene-15 .guestbook-form-card h2 {
+    font-size: clamp(23px, 2vw, 29px) !important;
+    line-height: 1.08 !important;
+    margin: 0 0 6px !important;
+  }
+  #scene-15 .guestbook-wishes-card h3,
+  #scene-15 .guestbook-form-card h3 {
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+    margin: 0 0 10px !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card {
+    min-height: 135px !important;
+    max-height: 27vh !important;
+    padding: 15px 16px !important;
+  }
+  #scene-15 .guestbook-form {
+    gap: 6px !important;
+  }
+  #scene-15 .guestbook-form textarea {
+    min-height: 62px !important;
+    height: 62px !important;
+  }
+  #scene-15 .guestbook-form .turnstile-wrap {
+    margin: 2px 0 !important;
+  }
+  #scene-15 .guestbook-form .guestbook-status {
+    min-height: 16px !important;
+    margin: 2px 0 0 !important;
+  }
+}
+
+/* Mobile: slightly shorten the wishes card and lift the form so the
+   confirmation message clears the fixed BACK / CONTINUE controls. */
+@media (max-width: 700px), (pointer: coarse) {
+  #scene-15 .guestbook-panel {
+    top: 46% !important;
+    max-height: calc(100svh - 112px) !important;
+    overflow: visible !important;
+    padding: 8px 7px !important;
+  }
+  #scene-15 .guestbook-main-title {
+    margin-bottom: 7px !important;
+  }
+  #scene-15 .guestbook-layout {
+    gap: 7px !important;
+  }
+  #scene-15 .guestbook-wishes-card {
+    min-height: clamp(175px, 26svh, 220px) !important;
+    padding: 10px 12px !important;
+  }
+  #scene-15 .guestbook-wishes-card h2 {
+    font-size: clamp(20px, 5.2vw, 24px) !important;
+    margin-bottom: 4px !important;
+  }
+  #scene-15 .guestbook-wishes-card h3 {
+    margin-bottom: 6px !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card {
+    min-height: clamp(95px, 14svh, 125px) !important;
+    max-height: 18svh !important;
+    padding: 10px 12px !important;
+  }
+  #scene-15 .guestbook-form-card {
+    padding: 9px 12px !important;
+  }
+  #scene-15 .guestbook-form-card h2 {
+    margin-bottom: 3px !important;
+  }
+  #scene-15 .guestbook-form-card h3 {
+    margin-bottom: 4px !important;
+  }
+  #scene-15 .guestbook-form .guestbook-status {
+    min-height: 18px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+/* Minimal floating chapter navigation: no connecting line or solid rail.
+   It stays faint until hovered/focused on desktop; touch users retain a
+   subtle visible target that expands when pressed. */
+.story-progress.chapter-number-nav {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  opacity: .24 !important;
+  transition: opacity .22s ease !important;
+}
+.story-progress.chapter-number-nav:hover,
+.story-progress.chapter-number-nav:focus-within {
+  opacity: 1 !important;
+}
+.chapter-number-list::before {
+  display: none !important;
+  content: none !important;
+}
+.chapter-number {
+  background: rgba(18,17,15,.16) !important;
+  border: 1px solid rgba(232,211,164,.44) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+.chapter-number.is-active {
+  opacity: 1 !important;
+}
+@media (max-width: 700px), (pointer: coarse) {
+  .story-progress.chapter-number-nav {
+    opacity: .38 !important;
+    left: 5px !important;
+  }
+  .story-progress.chapter-number-nav:active,
+  .story-progress.chapter-number-nav:focus-within {
+    opacity: 1 !important;
+  }
+  .chapter-number-list::before {
+    display: none !important;
+    content: none !important;
+  }
+}
+
+
+/* Discourage casual image saving/dragging on the public wedding site.
+   Does not disable normal text selection or form interaction. */
+.scene img,
+.scene .scene-image,
+.bride-carousel img,
+.groom-carousel img,
+.carousel img,
+.carousel-slide img,
+.gallery img {
+  -webkit-user-drag: none;
+  user-drag: none;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+
+/* Mobile chapter changes use a full-frame cross-dissolve, not a wipe/crop. */
+@media (max-width: 700px), (pointer: coarse) {
+  html.stage #story > .scene {
+    clip-path: none !important;
+    -webkit-clip-path: none !important;
+    transform: none !important;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  html.stage #story > .scene .scene-image {
+    transform-origin: center center !important;
+  }
+}
