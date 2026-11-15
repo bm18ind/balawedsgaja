@@ -2761,3 +2761,129 @@ html.stage #story .scene .scene-copy.stage-snap{transition:none!important}
     min-height: 38px !important;
   }
 }
+
+/* FINAL NAV + MOBILE GUESTBOOK REFINEMENT
+   Navigation is completely absent until the visitor points to it or focuses it.
+   The tiny square markers remain the resting design; numbers appear on hover. */
+.story-progress.chapter-number-nav {
+  opacity: 0 !important;
+  transition: opacity .2s ease !important;
+}
+.story-progress.chapter-number-nav:hover,
+.story-progress.chapter-number-nav:focus-within {
+  opacity: 1 !important;
+}
+.chapter-number {
+  background: rgba(18,17,15,.16) !important;
+  border-color: rgba(232,211,164,.44) !important;
+}
+.chapter-number.is-active {
+  opacity: 1 !important;
+}
+@media (max-width: 700px), (pointer: coarse) {
+  .story-progress.chapter-number-nav {
+    opacity: 0 !important;
+  }
+  .story-progress.chapter-number-nav:active,
+  .story-progress.chapter-number-nav:focus-within {
+    opacity: 1 !important;
+  }
+
+  /* Centre the complete guestbook in the viewport and give both cards
+     comfortable width/height again, while keeping the bottom controls clear. */
+  #scene-15 .guestbook-panel {
+    left: 50% !important;
+    top: 45% !important;
+    width: min(92vw, 520px) !important;
+    max-width: min(92vw, 520px) !important;
+    max-height: calc(100svh - 126px) !important;
+    padding: 9px 8px !important;
+    transform: translate(-50%, -50%) !important;
+    box-sizing: border-box !important;
+  }
+  #scene-15.show-copy .guestbook-panel {
+    transform: translate(-50%, -50%) !important;
+  }
+  #scene-15 .guestbook-main-title {
+    font-size: clamp(27px, 6.8vw, 35px) !important;
+    margin: 0 0 8px !important;
+  }
+  #scene-15 .guestbook-layout {
+    gap: 9px !important;
+    grid-template-rows: auto auto !important;
+  }
+  #scene-15 .guestbook-wishes-card {
+    min-height: clamp(190px, 29svh, 235px) !important;
+    padding: 12px 13px !important;
+    border-radius: 16px !important;
+  }
+  #scene-15 .guestbook-wishes-card h2,
+  #scene-15 .guestbook-form-card h2 {
+    font-size: clamp(20px, 5.2vw, 25px) !important;
+    line-height: 1.08 !important;
+  }
+  #scene-15 .guestbook-wishes-card h3,
+  #scene-15 .guestbook-form-card h3 {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card {
+    height: clamp(112px, 17svh, 140px) !important;
+    min-height: 112px !important;
+    max-height: 140px !important;
+    padding: 11px 12px !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card p {
+    font-size: 15px !important;
+    line-height: 1.4 !important;
+  }
+  #scene-15 .guestbook-form-card {
+    padding: 11px 13px 12px !important;
+    border-radius: 16px !important;
+  }
+  #scene-15 .guestbook-form {
+    gap: 4px !important;
+  }
+  #scene-15 .guestbook-form label {
+    font-size: 9px !important;
+  }
+  #scene-15 .guestbook-form input {
+    height: 34px !important;
+    min-height: 34px !important;
+  }
+  #scene-15 .guestbook-form textarea {
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+  #scene-15 .guestbook-form .turnstile-wrap {
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+  #scene-15 .guestbook-form .guestbook-submit {
+    height: 32px !important;
+    min-height: 32px !important;
+    font-size: 9px !important;
+  }
+  #scene-15 .guestbook-form .guestbook-status {
+    min-height: 18px !important;
+    font-size: 10px !important;
+  }
+}
+@media (max-height: 740px) and (max-width: 700px) {
+  #scene-15 .guestbook-panel {
+    top: 44% !important;
+    max-height: calc(100svh - 118px) !important;
+  }
+  #scene-15 .guestbook-wishes-card {
+    min-height: 175px !important;
+  }
+  #scene-15 .guestbook-wishes-card .wish-card {
+    height: 105px !important;
+    min-height: 105px !important;
+    max-height: 105px !important;
+  }
+  #scene-15 .guestbook-form textarea {
+    height: 38px !important;
+    min-height: 38px !important;
+  }
+}

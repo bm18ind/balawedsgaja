@@ -27,7 +27,7 @@
   const T = {
     wipe: isMobile ? 1050 : 950,        // photograph reveal
     wipeDelay: 140,                    // outgoing text leaves first
-    copyAt: isMobile ? 560 : 520,       // when the new text begins, measured from the start
+    copyAt: isMobile ? 1240 : 520,      // mobile copy waits until the full photograph wipe has completed
     stagger: 85,                       // gap between lines of text
     child: 700,                        // each line's fade and rise
     cooldown: 100,                     // brief settle before the next queued change
@@ -249,7 +249,8 @@
       from.style.zIndex = '1';
       to.style.zIndex = '2';
       to.style.visibility = 'visible';
-      if (isMobile) to.classList.add('show-copy');
+      // Keep the incoming copy hidden until its photograph has fully wiped in.
+      // Mobile panels must not appear over a half-revealed image.
       setActive(target, false);
 
       // 1. the outgoing text lifts away
@@ -269,6 +270,7 @@
 
       // 3. the new text arrives once the photograph has landed
       await wait(T.copyAt);
+      if (isMobile) to.classList.add('show-copy');
       revealCopy(to);
       await wait(Math.max(0, T.wipe + T.wipeDelay - T.copyAt) + 40);
 
